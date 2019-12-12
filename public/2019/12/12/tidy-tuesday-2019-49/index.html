@@ -116,28 +116,28 @@ p_anim &lt;- ggplot(disease_2 %&gt;% filter(disease == &quot;Measles&quot;), aes
   geom_vline(xintercept = 1963, col = &quot;black&quot;) +
   labs(x = &quot;Year&quot;, y = &quot;State&quot;, fill = &quot;Rate\n(Cases per 100,000)&quot;)
 
+# uncomment to save animation
+# anim_save(p_anim, width = 1000, height = 600, filename = &quot;measles.gif&quot;)
+
 animate(p_anim, width = 1000, height = 600)</code></pre>
 <p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-3-1.gif" /><!-- --></p>
-<pre class="r"><code>
-# uncomment to save animation
-# anim_save(p_anim, width = 1000, height = 600, filename = &quot;measles.gif&quot;)</code></pre>
 <p>During the <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-03">2019-49 #TidyTuesday</a>, I saw some <a href="https://twitter.com/privlko/status/1201918825941360640">waffle plots on Twitter</a>. These had me intrigued, so I decided to play around with <code>geom_waffle</code> from the <a href="https://cinc.rud.is/web/packages/waffle/index.html">waffle</a> library.</p>
-<p>For this visual, I filtered for a single state (Georgia), and</p>
-<pre class="r"><code># states &lt;- c(&quot;Alabama&quot;, &quot;California&quot;, &quot;Colorado&quot;, &quot;Michigan&quot;, &quot;New York&quot;, &quot;Texas&quot;)
-states &lt;- c(&quot;Georgia&quot;)
+<p>For this visual, I filtered for a single state (Georgia) and limited the time frame from 1976 to 1995. With the waffle plot, you can see that there were upticks in measles cases in 1977, 1979, 1980, and 1990. From some quick web searching, there does appear to have been an outbreak of measles in GA in 1990.</p>
+<pre class="r"><code>disease_3 &lt;- disease_2 %&gt;% 
+  filter(state == &quot;Georgia&quot; &amp; year %in% c(1976:1995))
 
-p_waffle &lt;- ggplot(disease_2 %&gt;% filter(state %in% states, year %in% c(1976:1995))) +
+p_waffle &lt;- ggplot(disease_3) +
   geom_waffle(aes(fill = disease, values = count), 
               color = &quot;white&quot;, n_rows = 50, flip = TRUE) +
   facet_wrap(~year) +
   coord_equal() +
-  ggtitle(&quot;Measles Outbreak in Geogia \n(1980-2000&quot;) +
+  ggtitle(&quot;Measles Outbreak in Geogia \n(1976-1995)&quot;) +
   theme_classic()
 
 p_waffle</code></pre>
 <p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <p>As a comparison, I also made a line graph with the same data.</p>
-<pre class="r"><code>p_line &lt;- ggplot(disease_2 %&gt;% filter(state %in% states, year %in% c(1940:2000))) +
+<pre class="r"><code>p_line &lt;- ggplot(disease_3) +
   geom_line(aes(x = year,color = disease, y = count)) +
   theme_classic()
 
@@ -147,9 +147,9 @@ p_line</code></pre>
 </div>
 <div id="part-2-international-murders" class="section level1">
 <h1>Part 2: International Murders</h1>
+<p><em>Under development</em></p>
 <pre class="r"><code>names(guns) &lt;- c(&quot;country&quot;, &quot;count&quot;)
-ggplot(guns) + geom_bar(aes(x = country, y = count), stat = &quot;identity&quot;, fill = &quot;red&quot;)</code></pre>
-<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+# ggplot(guns) + geom_bar(aes(x = country, y = count), stat = &quot;identity&quot;, fill = &quot;red&quot;)</code></pre>
 </div>
 
     </div>

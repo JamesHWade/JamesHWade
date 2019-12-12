@@ -61,26 +61,26 @@ p_anim <- ggplot(disease_2 %>% filter(disease == "Measles"), aes(x = year, y = s
   geom_vline(xintercept = 1963, col = "black") +
   labs(x = "Year", y = "State", fill = "Rate\n(Cases per 100,000)")
 
-animate(p_anim, width = 1000, height = 600)
-
 # uncomment to save animation
 # anim_save(p_anim, width = 1000, height = 600, filename = "measles.gif")
+
+animate(p_anim, width = 1000, height = 600)
 ```
 
 During the [2019-49 #TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-03), I saw some [waffle plots on Twitter](https://twitter.com/privlko/status/1201918825941360640). These had me intrigued, so I decided to play around with `geom_waffle` from the [waffle](https://cinc.rud.is/web/packages/waffle/index.html) library.
 
-For this visual, I filtered for a single state (Georgia), and 
+For this visual, I filtered for a single state (Georgia) and limited the time frame from 1976 to 1995. With the waffle plot, you can see that there were upticks in measles cases in 1977, 1979, 1980, and 1990. From some quick web searching, there does appear to have been an outbreak of measles in GA in 1990.
 
 ```{r}
-# states <- c("Alabama", "California", "Colorado", "Michigan", "New York", "Texas")
-states <- c("Georgia")
+disease_3 <- disease_2 %>% 
+  filter(state == "Georgia" & year %in% c(1976:1995))
 
-p_waffle <- ggplot(disease_2 %>% filter(state %in% states, year %in% c(1976:1995))) +
+p_waffle <- ggplot(disease_3) +
   geom_waffle(aes(fill = disease, values = count), 
               color = "white", n_rows = 50, flip = TRUE) +
   facet_wrap(~year) +
   coord_equal() +
-  ggtitle("Measles Outbreak in Geogia \n(1980-2000") +
+  ggtitle("Measles Outbreak in Geogia \n(1976-1995)") +
   theme_classic()
 
 p_waffle
@@ -89,7 +89,7 @@ p_waffle
 As a comparison, I also made a line graph with the same data.
 
 ```{r}
-p_line <- ggplot(disease_2 %>% filter(state %in% states, year %in% c(1940:2000))) +
+p_line <- ggplot(disease_3) +
   geom_line(aes(x = year,color = disease, y = count)) +
   theme_classic()
 
@@ -99,8 +99,10 @@ p_line
 
 # Part 2: International Murders
 
+*Under development*
+
 ```{r}
 names(guns) <- c("country", "count")
-ggplot(guns) + geom_bar(aes(x = country, y = count), stat = "identity", fill = "red")
+# ggplot(guns) + geom_bar(aes(x = country, y = count), stat = "identity", fill = "red")
 ```
 
