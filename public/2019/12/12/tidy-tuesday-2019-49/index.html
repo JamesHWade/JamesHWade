@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.61.0" />
+
+
+<title>Tidy Tuesday 2019-49 - James H. Wade</title>
+<meta property="og:title" content="Tidy Tuesday 2019-49 - James H. Wade">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/rstudio/blogdown">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/rstudio">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">3 min read</span>
+    
+
+    <h1 class="article-title">Tidy Tuesday 2019-49</h1>
+
+    
+    <span class="article-date">2019-12-12</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>Here is my entry for <a href="https://github.com/rfordatascience/tidytuesday">#TidyTuesday</a> from 2019-50: ‘You can make it in R.’</p>
+<div id="import-the-data" class="section level2">
+<h2>Import the Data</h2>
+<pre class="r"><code>library(tidyverse)
+library(gganimate)
+library(waffle)
+
+d &lt;- tidytuesdayR::tt_load(2019, week = 50)
+
+diseases &lt;- d$diseases
+murders &lt;- d$international_murders
+guns &lt;- d$gun_murders
+regents &lt;- d$nyc_regents</code></pre>
+</div>
+<div id="part-1-diseases" class="section level1">
+<h1>Part 1: Diseases</h1>
+<p>The first plot was inspired by an <a href="http://graphics.wsj.com/infectious-diseases-and-vaccines/">interactive graphic</a> from WSJ. The data for these visuals comes from the <a href="https://www.tycho.pitt.edu">Tycho Project</a>.</p>
+<p>To start, let’s add a column that provides a <em>rate</em> of disease incidence. The metrics will be in using of cases per 100,000 people per year.</p>
+<pre class="r"><code>disease_2 &lt;- diseases %&gt;% 
+  group_by(year, state, disease) %&gt;% 
+  mutate(rate = count / population * 10000 * 52 / weeks_reporting) %&gt;% 
+  ungroup()</code></pre>
+<div id="measles-plot-with-vaccine" class="section level2">
+<h2>Measles Plot with Vaccine</h2>
+<p>The graphic from the blog post uses Measles. This is a particularly impactful graphic emphasizing the impact of the measles vaccine on the rate of measles occurence across US states. Rather than improve upon this already impressive graph, I chose to animate it instead. This uses the gganimate package. This animation only require an additional 3 lines of code. So fancy for such little effort!</p>
+<pre class="r"><code>jet.colors &lt;- colorRampPalette(c(&quot;#F0FFFF&quot;, &quot;cyan&quot;, &quot;#007FFF&quot;, &quot;yellow&quot;, 
+                                 &quot;#FFBF00&quot;, &quot;orange&quot;, &quot;red&quot;, &quot;#7F0000&quot;), bias = 2.25)
+
+
+p_anim &lt;- ggplot(disease_2 %&gt;% filter(disease == &quot;Measles&quot;), aes(x = year, y = state, fill = rate)) + 
+  geom_tile(color = &quot;white&quot;, size = 0.35) +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_fill_gradientn(colors = jet.colors(16), na.value = &#39;white&#39;) +
+  theme_minimal() +
+  transition_time(year) + 
+  shadow_mark() +
+  annotate(geom = &quot;text&quot;, x = 1963.5, y = 50.5, label = &quot;Vaccine introduced&quot;, size = 5, hjust = 0) +
+  ggtitle(&quot;Incidence of Meases (USA) \n1928-2011&quot;) +
+  geom_vline(xintercept = 1963, col = &quot;black&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;State&quot;, fill = &quot;Rate\n(Cases per 100,000)&quot;)
+
+animate(p_anim, width = 1000, height = 600)</code></pre>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-3-1.gif" /><!-- --></p>
+<pre class="r"><code>
+# uncomment to save animation
+# anim_save(p_anim, width = 1000, height = 600, filename = &quot;measles.gif&quot;)</code></pre>
+<p>During the <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-03">2019-49 #TidyTuesday</a>, I saw some <a href="https://twitter.com/privlko/status/1201918825941360640">waffle plots on Twitter</a>. These had me intrigued, so I decided to play around with <code>geom_waffle</code> from the <a href="https://cinc.rud.is/web/packages/waffle/index.html">waffle</a> library.</p>
+<p>For this visual, I filtered for a single state (Georgia), and</p>
+<pre class="r"><code># states &lt;- c(&quot;Alabama&quot;, &quot;California&quot;, &quot;Colorado&quot;, &quot;Michigan&quot;, &quot;New York&quot;, &quot;Texas&quot;)
+states &lt;- c(&quot;Georgia&quot;)
+
+p_waffle &lt;- ggplot(disease_2 %&gt;% filter(state %in% states, year %in% c(1976:1995))) +
+  geom_waffle(aes(fill = disease, values = count), 
+              color = &quot;white&quot;, n_rows = 50, flip = TRUE) +
+  facet_wrap(~year) +
+  coord_equal() +
+  ggtitle(&quot;Measles Outbreak in Geogia \n(1980-2000&quot;) +
+  theme_classic()
+
+p_waffle</code></pre>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>As a comparison, I also made a line graph with the same data.</p>
+<pre class="r"><code>p_line &lt;- ggplot(disease_2 %&gt;% filter(state %in% states, year %in% c(1940:2000))) +
+  geom_line(aes(x = year,color = disease, y = count)) +
+  theme_classic()
+
+p_line</code></pre>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+</div>
+<div id="part-2-international-murders" class="section level1">
+<h1>Part 2: International Murders</h1>
+<pre class="r"><code>names(guns) &lt;- c(&quot;country&quot;, &quot;count&quot;)
+ggplot(guns) + geom_bar(aes(x = country, y = count), stat = &quot;identity&quot;, fill = &quot;red&quot;)</code></pre>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+
