@@ -140,7 +140,7 @@ code {
 }
 
 .article-content hr {
-  width: 150px;
+  width: 300px;
   margin: 50px auto;
   height: 1px;
   overflow: hidden;
@@ -268,7 +268,7 @@ code {
   }
 
   .content {
-    font-size: 19px;
+    font-size: 14px;
     line-height: 1.8;
   }
 
