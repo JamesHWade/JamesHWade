@@ -6,20 +6,20 @@
     <description>Recent content in plot on James H. Wade</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Jul 2015 21:13:14 -0500</lastBuildDate>
+    <lastBuildDate>Thu, 12 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/plot/index.xml" rel="self" type="application/rss+xml" />
     
     
     <item>
-      <title>Hello R Markdown</title>
-      <link>/2015/07/23/hello-r-markdown/</link>
-      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      <title>Tidy Tuesday 2019-49</title>
+      <link>/2019/12/12/tidy-tuesday-2019-49/</link>
+      <pubDate>Thu, 12 Dec 2019 00:00:00 +0000</pubDate>
       
-      <guid>/2015/07/23/hello-r-markdown/</guid>
-      <description>R Markdown This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see http://rmarkdown.rstudio.com.
-You can embed an R code chunk like this:
-summary(cars) ## speed dist ## Min. : 4.0 Min. : 2.00 ## 1st Qu.:12.0 1st Qu.: 26.00 ## Median :15.0 Median : 36.00 ## Mean :15.4 Mean : 42.98 ## 3rd Qu.</description>
+      <guid>/2019/12/12/tidy-tuesday-2019-49/</guid>
+      <description>Here is my entry for #TidyTuesday from 2019-50: ‘You can make it in R.’
+Import the Data library(tidyverse) library(gganimate) library(waffle) d &amp;lt;- tidytuesdayR::tt_load(2019, week = 50) diseases &amp;lt;- d$diseases murders &amp;lt;- d$international_murders guns &amp;lt;- d$gun_murders regents &amp;lt;- d$nyc_regents  Part 1: Diseases The first plot was inspired by an interactive graphic from WSJ. The data for these visuals comes from the Tycho Project.
+To start, let’s add a column that provides a rate of disease incidence.</description>
     </item>
     
   </channel>
