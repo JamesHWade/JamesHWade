@@ -23,7 +23,7 @@ d <- tidytuesdayR::tt_load(2019, week = 49)[[1]]
 glimpse(d)
 ```
 
-Inspecting the data, I won't need to do much data cleaning. The `violation_desc` character variable could use some adjustment. I'll use forcats to collapse `r d$violation_desc` classes into a reasonable number. I will also create a number of new columns pulling out date features. Below, I use the gganimate library, and the only way I was able to get on the plots was to convert the `violation_desc` variable to a numeric type. Finally, I filter the data for Philadelphia using the coordinates from the osmdata package.
+Inspecting the data, I won't need to do much data cleaning. The `violation_desc` character variable could use some adjustment. I'll use forcats to collapse `r length(unique(d$violation_desc))` classes into a reasonable number. I will also create a number of new columns pulling out date features. Below, I use the gganimate library, and the only way I was able to get on the plots was to convert the `violation_desc` variable to a numeric type. Finally, I filter the data for Philadelphia using the coordinates from the osmdata package.
 
 ```{r}
 library(osmdata)
