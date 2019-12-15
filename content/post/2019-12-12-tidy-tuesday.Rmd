@@ -95,3 +95,43 @@ p_line <- ggplot(disease_3) +
 
 p_line
 ```
+
+## *Post Update*
+
+[geocacheR](https://twitter.com/GeocacherB) gave me some feedback on the animated plot. I like the suggestions, so I'd like to implement them. Key points were:
+
+  * Too many colors
+  * Difference between missing data and low vaccine incidence was unclear
+  * Change gridlines, horizonal ones aren't helpful, but maybe adding vertical onces could help
+  
+
+  
+```{r}
+disease_3 <- disease_2 %>%
+  filter(state != "Hawaii" & state != "Alaska" & disease == "Measles") %>% 
+  mutate(rate = case_when(is.nan(rate) ~ 0, TRUE ~ rate))
+
+p_anim_2 <- ggplot(disease_3, aes(x = year, y = state, fill = rate)) +
+  geom_tile(color = "white", size = 0.35) +
+  scale_x_continuous(expand = c(0,0)) +
+  # scale_fill_gradient2() +
+  # scale_fill_gradientn(colors = jet.colors(16), na.value = 'white') +
+  theme_minimal() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  transition_time(year) +
+  shadow_mark() +
+  annotate(geom = "text", x = 1963.5, y = 48.5, label = "Vaccine introduced", size = 5, hjust = 0) +
+  ggtitle("Incidence of Meases (USA) \n1928-2011") +
+  geom_vline(xintercept = 1963, col = "black") +
+  geom_vline(xintercept = seq(from = 1930, to = 2000, by = 10), col = "grey20", alpha = 0.2, linetype = "dashed") +
+  labs(x = "Year", y = "State", fill = "Rate\n(Cases per 100,000)")
+
+# new color scheme
+p_anim_2a <- p_anim_2 + scale_fill_gradient2()
+animate(p_anim_2a, width = 1000, height = 600, )
+
+# old color scheme
+p_anim_2b <- p_anim_2 + scale_fill_gradientn(colors = jet.colors(16), na.value = 'white')
+animate(p_anim_2b, width = 1000, height = 600)
+```
+

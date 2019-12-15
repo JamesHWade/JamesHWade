@@ -62,7 +62,7 @@
 
   <article class="article">
     
-    <span class="article-duration">3 min read</span>
+    <span class="article-duration">4 min read</span>
     
 
     <h1 class="article-title">Tidy Tuesday 2019-50</h1>
@@ -143,6 +143,42 @@ p_waffle</code></pre>
 
 p_line</code></pre>
 <p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="post-update" class="section level2">
+<h2><em>Post Update</em></h2>
+<p><a href="https://twitter.com/GeocacherB">geocacheR</a> gave me some feedback on the animated plot. I like the suggestions, so I’d like to implement them. Key points were:</p>
+<ul>
+<li>Too many colors</li>
+<li>Difference between missing data and low vaccine incidence was unclear</li>
+<li>Change gridlines, horizonal ones aren’t helpful, but maybe adding vertical onces could help</li>
+</ul>
+<pre class="r"><code>disease_3 &lt;- disease_2 %&gt;%
+  filter(state != &quot;Hawaii&quot; &amp; state != &quot;Alaska&quot; &amp; disease == &quot;Measles&quot;) %&gt;% 
+  mutate(rate = case_when(is.nan(rate) ~ 0, TRUE ~ rate))
+
+p_anim_2 &lt;- ggplot(disease_3, aes(x = year, y = state, fill = rate)) +
+  geom_tile(color = &quot;white&quot;, size = 0.35) +
+  scale_x_continuous(expand = c(0,0)) +
+  # scale_fill_gradient2() +
+  # scale_fill_gradientn(colors = jet.colors(16), na.value = &#39;white&#39;) +
+  theme_minimal() + 
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  transition_time(year) +
+  shadow_mark() +
+  annotate(geom = &quot;text&quot;, x = 1963.5, y = 48.5, label = &quot;Vaccine introduced&quot;, size = 5, hjust = 0) +
+  ggtitle(&quot;Incidence of Meases (USA) \n1928-2011&quot;) +
+  geom_vline(xintercept = 1963, col = &quot;black&quot;) +
+  geom_vline(xintercept = seq(from = 1930, to = 2000, by = 10), col = &quot;grey20&quot;, alpha = 0.2, linetype = &quot;dashed&quot;) +
+  labs(x = &quot;Year&quot;, y = &quot;State&quot;, fill = &quot;Rate\n(Cases per 100,000)&quot;)
+
+# new color scheme
+p_anim_2a &lt;- p_anim_2 + scale_fill_gradient2()
+animate(p_anim_2a, width = 1000, height = 600, )
+
+# old color scheme
+p_anim_2b &lt;- p_anim_2 + scale_fill_gradientn(colors = jet.colors(16), na.value = &#39;white&#39;)
+animate(p_anim_2b, width = 1000, height = 600)</code></pre>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-6-1.gif" /><!-- --></p>
 </div>
 </div>
 
