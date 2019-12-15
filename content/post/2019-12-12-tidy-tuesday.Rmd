@@ -1,6 +1,7 @@
 ---
 title: "Tidy Tuesday 2019-50"
 author: "James Wade"
+slug: "tidy-tuesday-2019-50"
 date: 2019-12-12
 categories: ["R"]
 tags: ["R Markdown", "plot", "data viz", "TidyTuesday"]
@@ -14,7 +15,7 @@ Here is my entry for [#TidyTuesday](https://github.com/rfordatascience/tidytuesd
 
 ## Import the Data
 
-```{r message=FALSE, warning=FALSE}
+```{r import, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(gganimate)
 library(waffle)
@@ -33,7 +34,7 @@ The first plot was inspired by an [interactive graphic](http://graphics.wsj.com/
 
 To start, let's add a column that provides a *rate* of disease incidence. The metrics will be in using of cases per 100,000 people per year.
 
-```{r}
+```{r cleaning}
 disease_2 <- diseases %>% 
   group_by(year, state, disease) %>% 
   mutate(rate = count / population * 10000 * 52 / weeks_reporting) %>% 
@@ -44,7 +45,7 @@ disease_2 <- diseases %>%
 
 The graphic from the blog post uses Measles. This is a particularly impactful graphic emphasizing the impact of the measles vaccine on the rate of measles occurence across US states. Rather than improve upon this already impressive graph, I chose to animate it instead. This uses the gganimate package. This animation only require an additional 3 lines of code. So fancy for such little effort!
 
-```{r}
+```{r animation}
 jet.colors <- colorRampPalette(c("#F0FFFF", "cyan", "#007FFF", "yellow", 
                                  "#FFBF00", "orange", "red", "#7F0000"), bias = 2.25)
 
@@ -71,7 +72,7 @@ During the [2019-49 #TidyTuesday](https://github.com/rfordatascience/tidytuesday
 
 For this visual, I filtered for a single state (Georgia) and limited the time frame from 1976 to 1995. With the waffle plot, you can see that there were upticks in measles cases in 1977, 1979, 1980, and 1990. From some quick web searching, there does appear to have been an outbreak of measles in GA in 1990.
 
-```{r}
+```{r waffle_plot}
 disease_3 <- disease_2 %>% 
   filter(state == "Georgia" & year %in% c(1976:1995))
 
@@ -88,7 +89,7 @@ p_waffle
 
 As a comparison, I also made a line graph with the same data.
 
-```{r}
+```{r line_plot}
 p_line <- ggplot(disease_3) +
   geom_line(aes(x = year,color = disease, y = count)) +
   theme_classic()
@@ -106,7 +107,7 @@ p_line
   
 
   
-```{r}
+```{r round_2}
 disease_3 <- disease_2 %>%
   filter(state != "Hawaii" & state != "Alaska" & disease == "Measles") %>% 
   mutate(rate = case_when(is.nan(rate) ~ 0, TRUE ~ rate))
@@ -129,7 +130,12 @@ p_anim_2 <- ggplot(disease_3, aes(x = year, y = state, fill = rate)) +
 # new color scheme
 p_anim_2a <- p_anim_2 + scale_fill_gradient2()
 animate(p_anim_2a, width = 1000, height = 600, )
+```
 
+
+I think I like the original colors, so here are the plot updates with those included.
+
+```{r round_2b}
 # old color scheme
 p_anim_2b <- p_anim_2 + scale_fill_gradientn(colors = jet.colors(16), na.value = 'white')
 animate(p_anim_2b, width = 1000, height = 600)

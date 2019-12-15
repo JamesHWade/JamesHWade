@@ -1,6 +1,7 @@
 ---
 title: "Tidy Tuesday 2019-49"
 author: "James Wade"
+slug: "tidy-tuesday-2019-49"
 date: 2019-12-10
 categories: ["R"]
 tags: ["R Markdown", "plot", "data viz", "TidyTuesday"]
@@ -25,7 +26,7 @@ glimpse(d)
 
 Inspecting the data, I won't need to do much data cleaning. The `violation_desc` character variable could use some adjustment. I'll use forcats to collapse `r length(unique(d$violation_desc))` classes into a reasonable number. I will also create a number of new columns pulling out date features. Below, I use the gganimate library, and the only way I was able to get on the plots was to convert the `violation_desc` variable to a numeric type. Finally, I filter the data for Philadelphia using the coordinates from the osmdata package.
 
-```{r}
+```{r cleaning}
 library(osmdata)
 
 coord <- getbb("Philadelphia, PA")
@@ -72,7 +73,7 @@ p_map
 
 As a tidyverse fan, this was a pleasant surprise to learn about map creation with ggplot. Adding ticket information is straight forward from here. I used `geom_pointdensity` from ggpointdensity. The rest of the code is mostly tweaking the style of the plot. You can see from the plot that most of the tickets are given around the city center - not too surprising.
 
-```{r}
+```{r tickets}
 library(ggpointdensity)
 p_tickets <- p_map + 
   geom_pointdensity(data = sample_n(d2, 1e4), aes(y = lat, x = lon), alpha = 0.4) +
@@ -87,7 +88,7 @@ p_tickets
 
 To spice up the plot a bit, I added gganimate. This took some trial and error to get right, but I eventually produced a plot I could be proud of. In addition to the animation, I created a table of violations using ggpub. I want to explore the issue I had with gganimate on character types later on, but the conversion to numeric mentioned above did the trick for now.
 
-```{r}
+```{r animation}
 library(ggpubr)
 library(gganimate)
 # create table of violations

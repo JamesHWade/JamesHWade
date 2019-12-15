@@ -120,7 +120,7 @@ p_anim &lt;- ggplot(disease_2 %&gt;% filter(disease == &quot;Measles&quot;), aes
 # anim_save(p_anim, width = 1000, height = 600, filename = &quot;measles.gif&quot;)
 
 animate(p_anim, width = 1000, height = 600)</code></pre>
-<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-3-1.gif" /><!-- --></p>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/animation-1.gif" /><!-- --></p>
 <p>During the <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-03">2019-49 #TidyTuesday</a>, I saw some <a href="https://twitter.com/privlko/status/1201918825941360640">waffle plots on Twitter</a>. These had me intrigued, so I decided to play around with <code>geom_waffle</code> from the <a href="https://cinc.rud.is/web/packages/waffle/index.html">waffle</a> library.</p>
 <p>For this visual, I filtered for a single state (Georgia) and limited the time frame from 1976 to 1995. With the waffle plot, you can see that there were upticks in measles cases in 1977, 1979, 1980, and 1990. From some quick web searching, there does appear to have been an outbreak of measles in GA in 1990.</p>
 <pre class="r"><code>disease_3 &lt;- disease_2 %&gt;% 
@@ -135,14 +135,14 @@ p_waffle &lt;- ggplot(disease_3) +
   theme_classic()
 
 p_waffle</code></pre>
-<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/waffle_plot-1.png" width="672" /></p>
 <p>As a comparison, I also made a line graph with the same data.</p>
 <pre class="r"><code>p_line &lt;- ggplot(disease_3) +
   geom_line(aes(x = year,color = disease, y = count)) +
   theme_classic()
 
 p_line</code></pre>
-<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/line_plot-1.png" width="672" /></p>
 </div>
 <div id="post-update" class="section level2">
 <h2><em>Post Update</em></h2>
@@ -173,12 +173,13 @@ p_anim_2 &lt;- ggplot(disease_3, aes(x = year, y = state, fill = rate)) +
 
 # new color scheme
 p_anim_2a &lt;- p_anim_2 + scale_fill_gradient2()
-animate(p_anim_2a, width = 1000, height = 600, )
-
-# old color scheme
+animate(p_anim_2a, width = 1000, height = 600, )</code></pre>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/round_2-1.gif" /><!-- --></p>
+<p>I think I like the original colors, so here are the plot updates with those included.</p>
+<pre class="r"><code># old color scheme
 p_anim_2b &lt;- p_anim_2 + scale_fill_gradientn(colors = jet.colors(16), na.value = &#39;white&#39;)
 animate(p_anim_2b, width = 1000, height = 600)</code></pre>
-<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/unnamed-chunk-6-1.gif" /><!-- --></p>
+<p><img src="/post/2019-12-12-tidy-tuesday_files/figure-html/round_2b-1.gif" /><!-- --></p>
 </div>
 </div>
 

@@ -1,6 +1,7 @@
 ---
 title: "Tidy Tuesday 2019-49"
 author: "James Wade"
+slug: "tidy-tuesday-2019-49"
 date: 2019-12-10
 categories: ["R"]
 tags: ["R Markdown", "plot", "data viz", "TidyTuesday"]
@@ -74,7 +75,7 @@ p_tickets &lt;- p_map +
   ggtitle(&quot;Philadelphia Parking Tickets - 2017 \nAll Ticket Types&quot;)
 
 p_tickets</code></pre>
-<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/tickets-1.png" width="672" /></p>
 <p>To spice up the plot a bit, I added gganimate. This took some trial and error to get right, but I eventually produced a plot I could be proud of. In addition to the animation, I created a table of violations using ggpub. I want to explore the issue I had with gganimate on character types later on, but the conversion to numeric mentioned above did the trick for now.</p>
 <pre class="r"><code>library(ggpubr)
 ## Loading required package: magrittr
@@ -109,7 +110,7 @@ p_animated &lt;- p_map +
         legend.position = c(0.8, 0.8))
 
 animate(p_animated, width = 500, height = 500)</code></pre>
-<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/unnamed-chunk-3-1.gif" /><!-- --></p>
+<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/animation-1.gif" /><!-- --></p>
 <p>Okay, that’s enough for today. I’ve added a few more plots without desciption below. I was mostly copying others plots from <a href="https://twitter.com/search?q=%23TidyTuesday&amp;src=recent_search_click">#TidyTuesday</a> on Twitter.</p>
 </div>
 <div id="extra-plots" class="section level2">
