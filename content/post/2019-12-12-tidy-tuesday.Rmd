@@ -1,5 +1,5 @@
 ---
-title: "Tidy Tuesday 2019-49"
+title: "Tidy Tuesday 2019-50"
 author: "James Wade"
 date: 2019-12-12
 categories: ["R"]
@@ -95,14 +95,3 @@ p_line <- ggplot(disease_3) +
 
 p_line
 ```
-
-
-# Part 2: International Murders
-
-*Under development*
-
-```{r}
-names(guns) <- c("country", "count")
-# ggplot(guns) + geom_bar(aes(x = country, y = count), stat = "identity", fill = "red")
-```
-

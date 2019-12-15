@@ -1,0 +1,61 @@
+---
+title: "Plastic Waste"
+author: "James Wade"
+date: 2019-12-14
+categories: ["R"]
+tags: ["R Markdown", "plot", "data viz", "TidyTuesday", "plastic"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+I'm sure you've heard about the challenges with plastic waste. Plastics touch nearly everyone's lives every day, and that is unlikley to change any time soon. No one likes plastic waste, and one way to better understand the problem is through visualization.
+
+## Import Data
+
+The data is from [Our World in Data](https://ourworldindata.org/plastic-pollution)
+
+```{r data_import}
+library(tidyverse)
+dat <- tidytuesdayR::tt_load(2019, week = 21)
+waste <- full_join(dat[[1]], dat[[2]]) %>% 
+  full_join(dat[[3]]) %>% 
+  janitor::clean_names()
+
+continents <- gapminder::gapminder %>% select(country, continent)
+
+waste <- left_join(waste, continents, by = c("entity" = "country"))
+
+glimpse(waste)
+```
+
+## 
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+ggplot(waste) +
+  geom_point(aes(x = per_capita_mismanaged_plastic_waste_kilograms_per_person_per_day, 
+                 y = gdp_per_capita_ppp_constant_2011_international_rate,
+                 group = entity,
+                 color = continent))
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+library(httr)
+library(XML)
+library(WDI)
+WDIbulk()
+
+url_path <- "https://api.worldbank.org/v2/sources/40/indicators"
+api <- GET(url = url_path, config = list(topic = "health"))
+post <- POST(url = url_path)
+site_content <- content(api) %>% xmlParse() %>% xmlToDataFrame()
+
+test <- GET(url = "http://api.worldbank.org/v2/country/all/indicator/SP.POP.TOTL?date=YTD:1950")
+asdf <- content(test) %>% xmlParse() %>% xmlToDataFrame()
+```
+
