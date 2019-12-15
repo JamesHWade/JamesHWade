@@ -16,7 +16,7 @@ Here is my entry for [#TidyTuesday](https://github.com/rfordatascience/tidytuesd
 
 The data for this week comes from [Open Data Philly](https://www.opendataphilly.org/dataset/parking-violations). I'll use tidytuesdayR library to import the data.
 
-```{r data_import}
+```{r data_import, message=FALSE}
 library(tidyverse)
 d <- tidytuesdayR::tt_load(2019, week = 49)[[1]]
 
@@ -79,7 +79,7 @@ p_tickets <- p_map +
   scale_color_viridis_c(option = 'viridis') + 
   labs(color = "Ticket Density") +
   theme(legend.background = element_rect(fill=alpha('white', 0.7)),
-        legend.position = c(0.8, 0.0)) +
+        legend.position = c(0.75, 0.0)) +
   ggtitle("Philadelphia Parking Tickets - 2017 \nAll Ticket Types")
 
 p_tickets
@@ -102,16 +102,16 @@ t1 <- d2 %>%
 
 # create animated plot
 p_animated <- p_map + 
-  geom_pointdensity(data = sample_n(d2, 1e4), aes(y = lat, x = lon), alpha = 0.8) +
+  geom_pointdensity(data = sample_n(d2, 1e4), aes(y = lat, x = lon), alpha = 0.5) +
   scale_color_viridis_c(option = 'viridis') + 
   labs(color = "Ticket Density") +
   transition_states(type_2, transition_length = 1, state_length = 2) +
   ggtitle('Philadelphia Parking Tickets - 2017 \nViolation Type: {closest_state}') +
   annotation_custom(grob = t1, ymax = 39.975, xmin = -75.13) +
   theme(legend.background = element_rect(fill=alpha('white', 0.7)),
-        legend.position = c(0.7, 0.7))
+        legend.position = c(0.8, 0.8))
 
-p_animated
+animate(p_animated, width = 500, height = 500)
 ```
 
 Okay, that's enough for today. I've added a few more plots without desciption below. I was mostly copying others plots from [#TidyTuesday](https://twitter.com/search?q=%23TidyTuesday&src=recent_search_click) on Twitter.

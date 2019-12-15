@@ -13,14 +13,6 @@ tags: ["R Markdown", "plot", "data viz", "TidyTuesday"]
 <h2>Importing and Cleaning the Data</h2>
 <p>The data for this week comes from <a href="https://www.opendataphilly.org/dataset/parking-violations">Open Data Philly</a>. I’ll use tidytuesdayR library to import the data.</p>
 <pre class="r"><code>library(tidyverse)
-## ── Attaching packages ──────────────────────────────────────────────────────────────────── tidyverse 1.3.0 ──
-## ✓ ggplot2 3.2.1     ✓ purrr   0.3.3
-## ✓ tibble  2.1.3     ✓ dplyr   0.8.3
-## ✓ tidyr   1.0.0     ✓ stringr 1.4.0
-## ✓ readr   1.3.1     ✓ forcats 0.4.0
-## ── Conflicts ─────────────────────────────────────────────────────────────────────── tidyverse_conflicts() ──
-## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()
 d &lt;- tidytuesdayR::tt_load(2019, week = 49)[[1]]
 
 glimpse(d)
@@ -78,7 +70,7 @@ p_tickets &lt;- p_map +
   scale_color_viridis_c(option = &#39;viridis&#39;) + 
   labs(color = &quot;Ticket Density&quot;) +
   theme(legend.background = element_rect(fill=alpha(&#39;white&#39;, 0.7)),
-        legend.position = c(0.8, 0.0)) +
+        legend.position = c(0.75, 0.0)) +
   ggtitle(&quot;Philadelphia Parking Tickets - 2017 \nAll Ticket Types&quot;)
 
 p_tickets</code></pre>
@@ -107,16 +99,16 @@ t1 &lt;- d2 %&gt;%
 
 # create animated plot
 p_animated &lt;- p_map + 
-  geom_pointdensity(data = sample_n(d2, 1e4), aes(y = lat, x = lon), alpha = 0.8) +
+  geom_pointdensity(data = sample_n(d2, 1e4), aes(y = lat, x = lon), alpha = 0.5) +
   scale_color_viridis_c(option = &#39;viridis&#39;) + 
   labs(color = &quot;Ticket Density&quot;) +
   transition_states(type_2, transition_length = 1, state_length = 2) +
   ggtitle(&#39;Philadelphia Parking Tickets - 2017 \nViolation Type: {closest_state}&#39;) +
   annotation_custom(grob = t1, ymax = 39.975, xmin = -75.13) +
   theme(legend.background = element_rect(fill=alpha(&#39;white&#39;, 0.7)),
-        legend.position = c(0.7, 0.7))
+        legend.position = c(0.8, 0.8))
 
-p_animated</code></pre>
+animate(p_animated, width = 500, height = 500)</code></pre>
 <p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/unnamed-chunk-3-1.gif" /><!-- --></p>
 <p>Okay, that’s enough for today. I’ve added a few more plots without desciption below. I was mostly copying others plots from <a href="https://twitter.com/search?q=%23TidyTuesday&amp;src=recent_search_click">#TidyTuesday</a> on Twitter.</p>
 </div>
