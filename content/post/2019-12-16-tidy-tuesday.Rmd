@@ -1,0 +1,161 @@
+---
+title: "Tidy Tuesday 2019-51"
+author: "James Wade"
+slug: "tidy-tuesday-2019-51"
+date: 2019-12-12
+categories: ["R"]
+tags: ["R Markdown", "plot", "data viz", "TidyTuesday"]
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Here is my entry for the 51st [#TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-17) if 2019: Adoptable dogs.
+
+## Import data
+
+This week, I download the csv files provided in the GitHub. I'd like to focus more on the visualization than the cleaning. The data comes from [PetFinder](petfinder.org) via their [API](https://www.petfinder.com/developers/). Please see the post from [The Pudding](https://github.com/the-pudding/data/blob/master/dog-shelters/README.md) for additional details. 
+
+```{r import_data, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(ggthemes)
+library(ggtext)
+library(geofacet)
+library(sf)
+library(rnaturalearth)
+library(viridis)
+
+moves <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-12-17/dog_moves.csv')
+descriptions <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-12-17/dog_descriptions.csv')
+travel <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-12-17/dog_travel.csv')
+```
+
+Since the cleaning has already been done for me, I'll skip to visulizaitons
+
+## Moves
+
+I live in Michigan, and we hear a lot about how often dogs are transported here for adoption. I'd like to create a visual of flow of dogs between states. Starting with a simple bar chart, we can see net movement of dogs. Note: it looks like Texas has a reporting issue, so I'll remove it.
+
+```{r move, message=FALSE, warning=FALSE}
+states <- tibble(states_abb = state.abb,
+                 states_name = state.name)
+
+m <- moves %>% 
+  filter(inUS == TRUE) %>% 
+  mutate(imported = case_when(is.na(imported) ~ 0,
+                              TRUE ~ imported),
+         exported = case_when(is.na(exported) ~ 0,
+                              TRUE ~ exported),
+         net_flow = (imported - exported) / total * 100) %>% 
+  left_join(states, by = c("location" = "states_name")) %>%
+  filter(location != "Texas" & !is.na(states_abb))
+
+p_net <- ggplot(m, aes(x = reorder(location, net_flow), y = net_flow, fill = net_flow > 0)) +
+  labs(x = "State", y = "Percent of Adoptable Dogs") +
+  scale_fill_manual(values = c("#ef8a62", "#67a9cf")) +
+  geom_bar(stat = "identity") +
+  annotate("text", label = "Dog Importer", x = 5, y = 25, color = "#67a9cf", size = 5) +
+  annotate("text", label = "Dog Exporter", x = 46, y = -25, color = "#ef8a62", size = 5) +
+  annotate("rect", xmin=0, xmax=51, ymin=0, ymax=30, alpha = 0.3, fill = "#67a9cf") +
+  annotate("rect", xmin=0, xmax=51, ymax=0, ymin=-30, alpha = 0.3, fill = "#ef8a62") +
+  theme_minimal() + 
+  labs(title = "**<span style='color:#67a9cf'>Imports</span> and <span style='color:#ef8a62'>Exports</span> of Dogs by State**",
+       subtitle = "Source: PetFinder | Texas Excluded (Suspected Outlier)",
+       caption = "#TidyTuesday | @JamesHWade") +
+  theme(plot.title = element_markdown(hjust = 0.5, size = 20),
+        plot.subtitle = element_markdown(hjust = 0.5, size = 10),
+        legend.position = "none",
+        panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        axis.text.x = element_text(angle = 90, hjust = 1))
+p_net
+
+ggsave(filename = "51_geombar.png", plot = p_net,
+       dpi = "retina", width = 8, height = 5)
+
+m2 <- moves %>% 
+  filter(inUS == TRUE) %>% 
+  mutate(imported = case_when(is.na(imported) ~ 0,
+                              TRUE ~ imported),
+         exported = case_when(is.na(exported) ~ 0,
+                              TRUE ~ exported),
+         import_percent = imported / total * 100,
+         export_percent = -exported / total * 100,
+         net_flow = (imported - exported) / total * 100) %>% 
+  pivot_longer(c(import_percent, export_percent, net_flow)) %>% 
+  filter(location != "Texas") # removing presumed outlier
+
+ggplot(m2, aes(x = reorder(location, value), y = value, fill = name)) + geom_col(position = "dodge") +
+  theme_minimal() + 
+  theme(legend.position = "none") +
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank()) +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) 
+```
+
+Just because I can and how easy it is, I'll make a plotly graph from that same plot.
+
+```{r move_plotly, message=FALSE, warning=FALSE}
+plotly::ggplotly(p_net)
+```
+
+### Making Maps with `geom_sf`
+
+To be honest, this took me way too long to get this plot to work, but learning is the whole point of #TidyTuesday, right? Below is the same data as above but shown on a map.
+
+```{r move_map, message=FALSE, warning=FALSE}
+usa <- ne_states(country = "United States of America", returnclass = 'sf')
+
+pet_data <- usa %>% left_join(m, by = c('name' = 'location'))
+
+mainland <- ggplot(data = pet_data) +
+     geom_sf(aes(fill = net_flow), size = 0.2) +
+     coord_sf(crs = st_crs(2163), xlim = c(-2500000, 2500000), ylim = c(-2300000, 
+         730000)) + theme_map() +
+  scale_fill_gradient2(low = "#ef8a62", high = "#67a9cf") +
+  labs(title = "**<span style='color:#67a9cf'>Imports</span> and <span style='color:#ef8a62'>Exports</span> of Dogs by State**",
+       subtitle = "Source: PetFinder | Texas Excluded (Suspected Outlier)",
+       caption = "#TidyTuesday | @JamesHWade") +
+  theme(plot.title = element_markdown(hjust = 0.5, size = 20),
+        plot.subtitle = element_markdown(hjust = 0.5, size = 10)) +
+  labs(fill = "Net Flow (%)", color = "Net Flow (%)", parse = TRUE)
+
+mainland
+
+ggsave(filename = "51_geomsf.png", plot = mainland,
+       dpi = "retina")
+```
+
+And, surprise! We can make a plotly graph again.
+
+```{r map_plotly, message=FALSE, warning=FALSE}
+plotly::ggplotly(mainland)
+```
+
+
+### `facet_geo` - My new Favorite Plot
+
+I've found a few plots on twitter using `facet_geo`, and I just had to give it a try. I took a lot of the code from [Thomas Mock](https://twitter.com/thomas_mock/status/1206641246351048705), but others put out similar looking plots.
+
+```{r geofacet, message=FALSE, warning=FALSE}
+p_geofacet <- ggplot(m, aes(x = "Dogs", y = net_flow, fill = net_flow > 0)) +
+  scale_fill_manual(values = c("#ef8a62", "#67a9cf")) +
+  geom_bar(stat = "identity") +
+  theme_minimal() + 
+  theme(legend.position = "none",
+        axis.text = element_blank(),
+        axis.title = element_blank(),
+        plot.title = element_markdown(hjust = 0.5, size = 20),
+        plot.subtitle = element_markdown(hjust = 0.5, size = 10),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank()) +
+  labs(title = "**<span style='color:#67a9cf'>Imports</span> and <span style='color:#ef8a62'>Exports</span> of Dogs by State**",
+       subtitle = "Source: PetFinder | Texas Excluded (Suspected Outlier)",
+       caption = "#TidyTuesday | @JamesHWade") +
+  facet_geo(~states_abb, grid = "us_state_grid2")
+
+p_geofacet
+
+ggsave(filename = "51_geofacet.png", plot = p_geofacet,
+       dpi = "retina")
+```
