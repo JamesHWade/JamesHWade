@@ -2,7 +2,7 @@
 title: "Tidy Tuesday 2019-51"
 author: "James Wade"
 slug: "tidy-tuesday-2019-51"
-date: 2019-12-12
+date: 2019-12-16
 categories: ["R"]
 tags: ["R Markdown", "plot", "data viz", "TidyTuesday"]
 ---
