@@ -24,7 +24,7 @@ library(ggtext)
 library(geofacet)
 library(sf)
 library(rnaturalearth)
-library(viridis)
+library(noncensus)
 
 moves <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-12-17/dog_moves.csv')
 descriptions <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2019/2019-12-17/dog_descriptions.csv')
@@ -38,8 +38,7 @@ Since the cleaning has already been done for me, I'll skip to visulizaitons
 I live in Michigan, and we hear a lot about how often dogs are transported here for adoption. I'd like to create a visual of flow of dogs between states. Starting with a simple bar chart, we can see net movement of dogs. Note: it looks like Texas has a reporting issue, so I'll remove it.
 
 ```{r move, message=FALSE, warning=FALSE}
-states <- tibble(states_abb = state.abb,
-                 states_name = state.name)
+data("states")
 
 m <- moves %>% 
   filter(inUS == TRUE) %>% 
@@ -48,8 +47,8 @@ m <- moves %>%
          exported = case_when(is.na(exported) ~ 0,
                               TRUE ~ exported),
          net_flow = (imported - exported) / total * 100) %>% 
-  left_join(states, by = c("location" = "states_name")) %>%
-  filter(location != "Texas" & !is.na(states_abb))
+  left_join(states, by = c("location" = "name")) %>%
+  filter(location != "Texas" & !is.na(state))
 
 p_net <- ggplot(m, aes(x = reorder(location, net_flow), y = net_flow, fill = net_flow > 0)) +
   labs(x = "State", y = "Percent of Adoptable Dogs") +
@@ -152,10 +151,46 @@ p_geofacet <- ggplot(m, aes(x = "Dogs", y = net_flow, fill = net_flow > 0)) +
   labs(title = "**<span style='color:#67a9cf'>Imports</span> and <span style='color:#ef8a62'>Exports</span> of Dogs by State**",
        subtitle = "Source: PetFinder | Texas Excluded (Suspected Outlier)",
        caption = "#TidyTuesday | @JamesHWade") +
-  facet_geo(~states_abb, grid = "us_state_grid2")
+  facet_geo(~state, grid = "us_state_grid2")
 
 p_geofacet
 
 # ggsave(filename = "51_geofacet.png", plot = p_geofacet,
        # dpi = "retina")
 ```
+
+## Part 2: Adoptable Dogs
+
+I've only made one plot for the larger dataset. I was curious which state had the most adoptable dogs per capita. The code and plot are below.
+
+```{r adoptable, message=FALSE, warning=FALSE}
+d <- descriptions %>%
+  group_by(contact_state) %>% 
+  summarise(count = n()) %>% 
+  left_join(states, by = c("contact_state" = "state")) %>% 
+  filter(!is.na(name)) %>% 
+  mutate(population = as.numeric(population),
+         dogs_per_capita = count / population * 100000)
+
+usa <- ne_states(country = "United States of America", returnclass = 'sf')
+
+per_cap <- usa %>% left_join(d, by = c("name" = "name"))
+
+per_cap_plot <- ggplot(data = per_cap) +
+     geom_sf(aes(fill = log(dogs_per_capita)), size = 0.2) +
+     coord_sf(crs = st_crs(2163), xlim = c(-2000000, 2500000), ylim = c(-2300000, 
+         730000)) + theme_map() +
+  scale_fill_gradient2(low = "#ef8a62", high = "#67a9cf", midpoint = 1.5) +
+  labs(title = "**Availability of Adoptable Dogs**",
+       subtitle = "Source: PetFinder | Dogs per 100,000 People",
+       caption = "#TidyTuesday | @JamesHWade") +
+  theme(plot.title = element_markdown(hjust = 0.5, size = 20),
+        plot.subtitle = element_markdown(hjust = 0.5, size = 10),
+        legend.position = c(0.9, 0.1)) +
+  labs(fill = "log(rate)")
+
+per_cap_plot
+
+ggsave(filename = "51_availability.png", plot = per_cap_plot, dpi = "retina")
+```
+

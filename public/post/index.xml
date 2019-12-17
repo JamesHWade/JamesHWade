@@ -19,7 +19,7 @@
       <guid>/2019/12/16/tidy-tuesday-2019-51/</guid>
       <description>Here is my entry for the 51st #TidyTuesday if 2019: Adoptable dogs.
 Import data This week, I download the csv files provided in the GitHub. I’d like to focus more on the visualization than the cleaning. The data comes from PetFinder via their API. Please see the post from The Pudding for additional details.
-library(tidyverse) library(ggthemes) library(ggtext) library(geofacet) library(sf) library(rnaturalearth) library(viridis) moves &amp;lt;- read_csv(&amp;#39;https://raw.</description>
+library(tidyverse) library(ggthemes) library(ggtext) library(geofacet) library(sf) library(rnaturalearth) library(noncensus) moves &amp;lt;- read_csv(&amp;#39;https://raw.</description>
     </item>
     
     <item>
