@@ -71,8 +71,8 @@ p_net <- ggplot(m, aes(x = reorder(location, net_flow), y = net_flow, fill = net
         axis.text.x = element_text(angle = 90, hjust = 1))
 p_net
 
-ggsave(filename = "51_geombar.png", plot = p_net,
-       dpi = "retina", width = 8, height = 5)
+# ggsave(filename = "51_geombar.png", plot = p_net,
+       # dpi = "retina", width = 8, height = 5)
 
 m2 <- moves %>% 
   filter(inUS == TRUE) %>% 
@@ -122,8 +122,8 @@ mainland <- ggplot(data = pet_data) +
 
 mainland
 
-ggsave(filename = "51_geomsf.png", plot = mainland,
-       dpi = "retina")
+# ggsave(filename = "51_geomsf.png", plot = mainland,
+       # dpi = "retina")
 ```
 
 And, surprise! We can make a plotly graph again.
@@ -156,6 +156,6 @@ p_geofacet <- ggplot(m, aes(x = "Dogs", y = net_flow, fill = net_flow > 0)) +
 
 p_geofacet
 
-ggsave(filename = "51_geofacet.png", plot = p_geofacet,
-       dpi = "retina")
+# ggsave(filename = "51_geofacet.png", plot = p_geofacet,
+       # dpi = "retina")
 ```

@@ -33,16 +33,5 @@ Import the Data library(tidyverse) library(gganimate) library(waffle) d &amp;lt;
 To start, let’s add a column that provides a rate of disease incidence.</description>
     </item>
     
-    <item>
-      <title>Tidy Tuesday 2019-49</title>
-      <link>/2019/12/10/tidy-tuesday-2019-49/</link>
-      <pubDate>Tue, 10 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/2019/12/10/tidy-tuesday-2019-49/</guid>
-      <description>Here is my entry for #TidyTuesday from 2019-49: Philadelphia Parking Tickets.
-Importing and Cleaning the Data The data for this week comes from Open Data Philly. I’ll use tidytuesdayR library to import the data.
-library(tidyverse) d &amp;lt;- tidytuesdayR::tt_load(2019, week = 49)[[1]] glimpse(d) ## Observations: 1,260,891 ## Variables: 7 ## $ violation_desc &amp;lt;chr&amp;gt; &amp;quot;BUS ONLY ZONE&amp;quot;, &amp;quot;STOPPING PROHIBITED&amp;quot;, &amp;quot;OVER TIME LIM… ## $ issue_datetime &amp;lt;dttm&amp;gt; 2017-12-06 12:29:00, 2017-10-16 18:03:00, 2017-11-02 … ## $ fine &amp;lt;dbl&amp;gt; 51, 51, 26, 26, 76, 51, 36, 36, 76, 26, 26, 301, 36, 5… ## $ issuing_agency &amp;lt;chr&amp;gt; &amp;quot;PPA&amp;quot;, &amp;quot;PPA&amp;quot;, &amp;quot;PPA&amp;quot;, &amp;quot;PPA&amp;quot;, &amp;quot;PPA&amp;quot;, &amp;quot;POLICE&amp;quot;, &amp;quot;PPA&amp;quot;, &amp;quot;P… ## $ lat &amp;lt;dbl&amp;gt; 40.</description>
-    </item>
-    
   </channel>
 </rss>
