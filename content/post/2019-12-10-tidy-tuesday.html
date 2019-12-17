@@ -1,0 +1,150 @@
+---
+title: "Tidy Tuesday 2019-49"
+author: "James Wade"
+slug: "tidy-tuesday-2019-49"
+date: 2019-12-10
+categories: ["R"]
+tags: ["R Markdown", "plot", "data viz", "TidyTuesday"]
+---
+
+
+
+<p>Here is my entry for <a href="https://github.com/rfordatascience/tidytuesday">#TidyTuesday</a> from 2019-49: <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-03">Philadelphia Parking Tickets</a>.</p>
+<div id="importing-and-cleaning-the-data" class="section level2">
+<h2>Importing and Cleaning the Data</h2>
+<p>The data for this week comes from <a href="https://www.opendataphilly.org/dataset/parking-violations">Open Data Philly</a>. I’ll use tidytuesdayR library to import the data.</p>
+<pre class="r"><code>library(tidyverse)
+d &lt;- tidytuesdayR::tt_load(2019, week = 49)[[1]]
+
+glimpse(d)
+## Observations: 1,260,891
+## Variables: 7
+## $ violation_desc &lt;chr&gt; &quot;BUS ONLY ZONE&quot;, &quot;STOPPING PROHIBITED&quot;, &quot;OVER TIME LIM…
+## $ issue_datetime &lt;dttm&gt; 2017-12-06 12:29:00, 2017-10-16 18:03:00, 2017-11-02 …
+## $ fine           &lt;dbl&gt; 51, 51, 26, 26, 76, 51, 36, 36, 76, 26, 26, 301, 36, 5…
+## $ issuing_agency &lt;chr&gt; &quot;PPA&quot;, &quot;PPA&quot;, &quot;PPA&quot;, &quot;PPA&quot;, &quot;PPA&quot;, &quot;POLICE&quot;, &quot;PPA&quot;, &quot;P…
+## $ lat            &lt;dbl&gt; 40.03550, 40.02571, 40.02579, 40.02590, 39.95617, 40.0…
+## $ lon            &lt;dbl&gt; -75.08111, -75.22249, -75.22256, -75.22271, -75.16603,…
+## $ zip_code       &lt;dbl&gt; 19149, 19127, 19127, 19127, 19102, NA, NA, 19106, 1914…</code></pre>
+<p>Inspecting the data, I won’t need to do much data cleaning. The <code>violation_desc</code> character variable could use some adjustment. I’ll use forcats to collapse 95 classes into a reasonable number. I will also create a number of new columns pulling out date features. Below, I use the gganimate library, and the only way I was able to get on the plots was to convert the <code>violation_desc</code> variable to a numeric type. Finally, I filter the data for Philadelphia using the coordinates from the osmdata package.</p>
+<pre class="r"><code>library(osmdata)
+## Data (c) OpenStreetMap contributors, ODbL 1.0. http://www.openstreetmap.org/copyright
+
+coord &lt;- getbb(&quot;Philadelphia, PA&quot;)
+
+d2 &lt;- d %&gt;% filter(between(lon, coord[1, 1], coord[1, 2]) &amp; 
+                     between(lat, coord[2, 1], coord[2, 2])) %&gt;% 
+  mutate(year = lubridate::year(issue_datetime),
+         month = lubridate::month(issue_datetime),
+         hour = lubridate::hour(issue_datetime),
+         day = lubridate::day(issue_datetime),
+         wday = lubridate::wday(issue_datetime),
+         violation_desc = str_squish(str_remove(pattern = &quot;CC|PING&quot;, violation_desc)),
+         type = fct_lump(violation_desc, n = 5, other_level = &quot;OTHER&quot;),
+         type_2 = as.numeric(type))</code></pre>
+</div>
+<div id="plotting-with-sf-and-geom_pointdensity" class="section level2">
+<h2>Plotting with sf and geom_pointdensity</h2>
+<p>To plot the ticket data onto a map, we need to collect some map data, again from the osmdata package. This was my first time using this package, and I heavily benefited from Julia Watzek ( <span class="citation">[@watzoever]</span>(<a href="https://twitter.com/watzoever" class="uri">https://twitter.com/watzoever</a>) ) for this section.</p>
+<pre class="r"><code>streets1 = opq(coord) %&gt;% 
+  add_osm_feature(&#39;highway&#39;, c(&#39;motorway&#39;, &#39;primary&#39;, &#39;secondary&#39;, &#39;tertiary&#39;)) %&gt;% 
+  osmdata_sf()
+
+streets2 = opq(coord) %&gt;% 
+  add_osm_feature(&#39;highway&#39;, c(&#39;residential&#39;, &#39;living_street&#39;, &#39;unclassified&#39;, &#39;service&#39;, &#39;foodway&#39;)) %&gt;% 
+  osmdata_sf()</code></pre>
+<p>With those features downloaded, we can create simple maps.</p>
+<pre class="r"><code>library(ggthemes)
+
+p_map &lt;- ggplot() + 
+  geom_sf(data = streets2$osm_lines, size = .1) +
+  geom_sf(data = streets1$osm_lines, size = .1) +
+  coord_sf(xlim = coord[1,], ylim = coord[2,], expand = FALSE) +
+  theme_map()
+
+p_map</code></pre>
+<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/map_example-1.png" width="672" /></p>
+<p>As a tidyverse fan, this was a pleasant surprise to learn about map creation with ggplot. Adding ticket information is straight forward from here. I used <code>geom_pointdensity</code> from ggpointdensity. The rest of the code is mostly tweaking the style of the plot. You can see from the plot that most of the tickets are given around the city center - not too surprising.</p>
+<pre class="r"><code>library(ggpointdensity)
+p_tickets &lt;- p_map + 
+  geom_pointdensity(data = sample_n(d2, 1e4), aes(y = lat, x = lon), alpha = 0.4) +
+  scale_color_viridis_c(option = &#39;viridis&#39;) + 
+  labs(color = &quot;Ticket Density&quot;) +
+  theme(legend.background = element_rect(fill=alpha(&#39;white&#39;, 0.7)),
+        legend.position = c(0.75, 0.0)) +
+  ggtitle(&quot;Philadelphia Parking Tickets - 2017 \nAll Ticket Types&quot;)
+
+p_tickets</code></pre>
+<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/tickets-1.png" width="672" /></p>
+<p>To spice up the plot a bit, I added gganimate. This took some trial and error to get right, but I eventually produced a plot I could be proud of. In addition to the animation, I created a table of violations using ggpub. I want to explore the issue I had with gganimate on character types later on, but the conversion to numeric mentioned above did the trick for now.</p>
+<pre class="r"><code>library(ggpubr)
+## Loading required package: magrittr
+## 
+## Attaching package: &#39;magrittr&#39;
+## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     set_names
+## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract
+library(gganimate)
+# create table of violations
+t1 &lt;- d2 %&gt;% 
+  select(type_2, type) %&gt;% 
+  distinct() %&gt;% 
+  arrange(type_2) %&gt;% 
+  rename(Index = type_2, Violation = type) %&gt;% 
+  ggtexttable(rows = NULL, theme = ttheme(tbody.style = tbody_style(fill = alpha(&#39;white&#39;, 0.5)),
+                                          colnames.style = colnames_style(fill = alpha(&#39;white&#39;, 0.5)))) %&gt;% 
+  ggplotGrob()
+
+# create animated plot
+p_animated &lt;- p_map + 
+  geom_pointdensity(data = sample_n(d2, 1e4), aes(y = lat, x = lon), alpha = 0.5) +
+  scale_color_viridis_c(option = &#39;viridis&#39;) + 
+  labs(color = &quot;Ticket Density&quot;) +
+  transition_states(type_2, transition_length = 1, state_length = 2) +
+  ggtitle(&#39;Philadelphia Parking Tickets - 2017 \nViolation Type: {closest_state}&#39;) +
+  annotation_custom(grob = t1, ymax = 39.975, xmin = -75.13) +
+  theme(legend.background = element_rect(fill=alpha(&#39;white&#39;, 0.7)),
+        legend.position = c(0.8, 0.8))
+
+animate(p_animated, width = 500, height = 500)</code></pre>
+<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/animation-1.gif" /><!-- --></p>
+<p>Okay, that’s enough for today. I’ve added a few more plots without desciption below. I was mostly copying others plots from <a href="https://twitter.com/search?q=%23TidyTuesday&amp;src=recent_search_click">#TidyTuesday</a> on Twitter.</p>
+</div>
+<div id="extra-plots" class="section level2">
+<h2>Extra Plots</h2>
+<pre class="r"><code>p_byhour &lt;- ggplot(sample_n(d2, 1e4)) + 
+  geom_bar(aes(fill = type, x = hour)) + 
+  coord_polar(start = -.14) +
+  scale_fill_brewer(palette = &quot;Spectral&quot;) +
+  labs(fill = &quot;Violation&quot;) + 
+  theme(legend.position = &quot;right&quot;,
+        legend.background = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid = element_line(color = &quot;black&quot;, size = 0.1, linetype = &quot;dotted&quot;),
+        panel.background = element_blank(),
+        plot.title = element_text(face = &quot;bold&quot;, size = 14))
+
+p_byhour</code></pre>
+<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/extra_plots-1.png" width="672" /></p>
+<pre class="r"><code>
+n_days &lt;- d2 %&gt;% select(month, day, year) %&gt;% distinct() %&gt;% nrow()
+
+p_bytype &lt;- ggplot(d2) + 
+  geom_bar(aes(x = type, fill = type), width = 0.3) +
+  scale_fill_brewer(palette = &quot;Spectral&quot;) +
+  scale_y_continuous(labels = function(x) x / n_days, 
+                     breaks = c(0, 250, 500, 750, 1000, 1250) * n_days) +
+  labs(y = &quot;Tickets per Day&quot;, x = &quot;Violation&quot;) +
+  coord_flip() +
+  theme_classic() +
+  theme(legend.position = &quot;none&quot;)
+
+p_bytype</code></pre>
+<p><img src="/post/2019-12-10-tidy-tuesday_files/figure-html/extra_plots-2.png" width="672" /></p>
+</div>
