@@ -1,7 +1,7 @@
 ---
-date: "2019-11-11"
-slug: "about"
 title: About
+author: James Wade
+slug: about
 ---
 
 # James H. Wade
