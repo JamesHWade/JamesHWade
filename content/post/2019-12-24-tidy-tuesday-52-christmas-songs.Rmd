@@ -186,5 +186,5 @@ ggplot(songs_by_year, aes(x = year, y = song_count)) +
 
 ## Lyrics
 
-I am a novice when it comes to text analysis, so I will reuse other's code here to get my feet wet.
+I am a novice when it comes to text analysis, so I will reuse other's code here to get my feet wet after a few more post to twitter.
 
