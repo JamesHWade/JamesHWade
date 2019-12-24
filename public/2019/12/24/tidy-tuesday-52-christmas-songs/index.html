@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.61.0" />
+
+
+<title>Tidy Tuesday 52 - Christmas Songs - James H. Wade</title>
+<meta property="og:title" content="Tidy Tuesday 52 - Christmas Songs - James H. Wade">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/JamesHWade">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/JamesHWade">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">4 min read</span>
+    
+
+    <h1 class="article-title">Tidy Tuesday 52 - Christmas Songs</h1>
+
+    
+    <span class="article-date">2019-12-24</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>This week’s <a href="https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-24">#TidyTuesday</a> is fittingly about Christmas songs. The clean version of the data comes from <a href="https://www.kaggle.com/sharkbait1223/billboard-top-100-christmas-carol-dataset/kernels">Kaggle</a>.</p>
+<div id="data-import" class="section level2">
+<h2>Data Import</h2>
+<p>As always, we’ll start with data import, and I’ll use the tidytuesdayR package.</p>
+<pre class="r"><code>library(tidyverse)
+library(ggthemes)
+dat &lt;- tidytuesdayR::tt_load(2019, week = 52)
+
+lyrics &lt;- dat$christmas_lyrics
+songs &lt;- dat $christmas_songs</code></pre>
+</div>
+<div id="songs" class="section level2">
+<h2>Songs</h2>
+<p>I’ll start by summarising some of the data. I’ll add three stats in this step:</p>
+<ol style="list-style-type: decimal">
+<li>Total number of songs put out by the performer(s)</li>
+<li>Length the artist’s song spent on the billboard top 100</li>
+<li>Quality score for the song defined as the sum of the normalized “rank” of the song. See the code below for details.</li>
+</ol>
+<pre class="r"><code>popular_songs &lt;- songs %&gt;% 
+  mutate(rank = (100 - week_position) / 100) %&gt;%
+  mutate(song = str_to_title(song)) %&gt;% 
+  group_by(performer, song, songid) %&gt;% 
+  summarise(song_rank = sum(rank),
+            release_year = min(year)) %&gt;% 
+  ungroup() %&gt;% 
+  arrange(-song_rank) %&gt;% 
+  unite(song:performer, col = &quot;song_artist&quot;, sep = &quot;\n&quot;, remove = FALSE) %&gt;% 
+  mutate(decade = release_year - release_year %% 10)
+
+top_songs &lt;- popular_songs$song_rank[25]
+
+p1 &lt;- ggplot(popular_songs %&gt;% filter(song_rank &gt;= top_songs)) +
+  geom_col(aes(x = reorder(song_artist, song_rank), y = song_rank, fill = factor(decade))) +
+  theme_clean() +
+  theme(legend.position = c(0.9, 0.2),
+        axis.ticks = element_blank()) +
+  coord_flip() + 
+  scale_fill_brewer(palette = &quot;RdYlGn&quot;, direction = 1) +
+  labs(y = &quot;Popularity Score&quot;, x = &quot;&quot;, 
+       fill = NULL,
+       title = &quot;Most Popular Christmas Songs of All Time&quot;, 
+       subtitle = &quot;Source: Billboard Top 100 1958-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;)
+
+# uncomment to save
+ggsave(p1, filename = &quot;top_songs.png&quot;, dpi = &quot;retina&quot;, width = 8, height = 10)
+
+p1</code></pre>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
+<div id="one-christmas-hit-wonder" class="section level3">
+<h3>One-Christmas-Hit-Wonder</h3>
+<p>Now, let’s take a look at which performers has the most Christmas hits, not just a one-Christmas-hit-wonder. The first plot shows number of songs on the Billboard Top 100 for each performer. Not too surprisingly, most performers only have one hit.</p>
+<pre class="r"><code>popular_artists &lt;- songs %&gt;% 
+  mutate(rank = (100 - week_position) / 100) %&gt;% 
+  group_by(performer, song) %&gt;% 
+  mutate(song_quality = sum(rank)) %&gt;% 
+  ungroup() %&gt;% 
+  select(song, performer, song_quality) %&gt;% 
+  distinct() %&gt;% 
+  group_by(performer) %&gt;% 
+  summarise(hits = n(),
+            avg_quality = mean(song_quality)) %&gt;% 
+  arrange(-hits)
+
+
+most_songs &lt;- popular_artists %&gt;% select(performer, hits) %&gt;% unique() %&gt;% arrange(-hits) %&gt;% pull(hits) %&gt;% .[15]
+
+p2 &lt;- ggplot(popular_artists %&gt;% filter(hits &gt;= most_songs)) + 
+  geom_col(aes(x = reorder(performer, hits), y = hits, fill = avg_quality)) +
+  coord_flip() +
+  theme_clean() +
+  theme(legend.position = c(0.9, 0.2),
+        axis.ticks = element_blank()) +
+  # scale_fill_brewer(palette = &quot;RdYlGn&quot;, direction = 1) +
+  labs(y = &quot;# of Christmas Hits&quot;, x = &quot;&quot;, 
+       fill = &quot;Average Score Quality&quot;,
+       title = &quot;Number of Christmas Hits for Each Artist&quot;, 
+       subtitle = &quot;Source: Billboard Top 100 1958-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;) +
+  scale_fill_viridis_c()
+  
+
+ggsave(p2, filename = &quot;performers_mostsongs.png&quot;, dpi = &quot;retina&quot;, width = 8, height = 8)
+
+p2</code></pre>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-3-1.png" width="768" /></p>
+<p>To see who makes the most popular Christmas songs on average, here’s plot showing number for Christmas hits versus the average popularity score. I’ve highlihted Mariah Carey and the Glee cast. It seems that the Glee cast barely made the Billboard top 100, as their popularity score is quite low.</p>
+<pre class="r"><code>p3 &lt;- ggplot(popular_artists) + 
+  geom_point(aes(x = hits, y = avg_quality, color = performer)) +
+  theme_clean() +
+  theme(legend.position = &quot;none&quot;) +
+  # scale_fill_brewer(palette = &quot;RdYlGn&quot;, direction = 1) +
+  labs(x = &quot;# of Christmas Hits&quot;, y = &quot;Average Song Popularity Score&quot;, 
+       fill = NULL,
+       title = &quot;Average Song Popularity vs Number of Christmas Hits&quot;, 
+       subtitle = &quot;Source: Billboard Top 100 1958-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;) +
+  geom_curve(x = 2.5, xend = 2.02, y = 6, yend = 6.78, arrow = arrow(length = unit(.2, &#39;cm&#39;))) +
+  geom_curve(x = 3.5, xend = 3.98, y = 1, yend = 0.25, arrow = arrow(length = unit(.2, &#39;cm&#39;))) +
+  annotate(&quot;text&quot;, label = &quot;Mariah Carey&quot;, x = 2.6, y = 5.75) +
+  annotate(&quot;text&quot;, label = &quot;Glee Cast&quot;, x = 3.4, y = 1.5) +
+  scale_color_viridis_d()
+
+ggsave(p3, filename = &quot;popular_vs_number.png&quot;, dpi = &quot;retina&quot;, width = 5, height = 5)
+
+p3</code></pre>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>To see who makes the <em>best</em> (mesured in popularity) Christmas songs, here’s a bar chart showing the artists with the highest average score performance.</p>
+<pre class="r"><code>p4 &lt;- ggplot(popular_artists %&gt;% filter(avg_quality &gt; 2)) + 
+  geom_col(aes(x = reorder(performer, avg_quality), y = avg_quality, fill = avg_quality)) +
+  coord_flip() +
+  theme_clean() +
+  labs(y = &quot;Average Quality Score&quot;,  y = &quot;&quot;) +
+  theme(axis.ticks = element_blank()) +
+  theme(legend.position = &quot;none&quot;) +
+  labs(x = &quot;&quot;, y = &quot;Average Song Popularity Score&quot;,
+       title = &quot;Top Christmas Artists by Average Song Popularity&quot;,
+       subtitle = &quot;Source: Billboard Top 100 1958-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;) +
+  # scale_fill_brewer(palette = &quot;RdYlGn&quot;, direction = 1) +
+  scale_fill_continuous(type = &quot;viridis&quot;)
+
+ggsave(p4, filename = &quot;avg_popularity.png&quot;, dpi = &quot;retina&quot;, width = 8, height = 8)
+
+p4</code></pre>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-5-1.png" width="768" /></p>
+</div>
+<div id="christmas-songs-by-year" class="section level3">
+<h3>Christmas Songs by Year</h3>
+<p>It looks like the popularity of Christmas songs is declining over time. The plot below of Christmas hits release by year shows this declining trend.</p>
+<pre class="r"><code>songs_by_year &lt;- songs %&gt;% group_by(song) %&gt;%
+  mutate(year = min(year)) %&gt;% 
+  ungroup() %&gt;% 
+  group_by(year) %&gt;% 
+  summarise(song_count = n())
+
+ggplot(songs_by_year, aes(x = year, y = song_count)) +
+  geom_line() +
+  theme_clean() +
+  geom_smooth(se = FALSE) +
+  labs(x = &quot;Year&quot;, y = &quot;Number of Hit Songs&quot;, 
+       title = &quot;Hit Christmas Songs per Year&quot;, 
+       subtitle = &quot;Source: Billboard Top 100 1958-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;)</code></pre>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+</div>
+</div>
+<div id="lyrics" class="section level2">
+<h2>Lyrics</h2>
+<p>I am a novice when it comes to text analysis, so I will reuse other’s code here to get my feet wet.</p>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

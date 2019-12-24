@@ -1,0 +1,190 @@
+---
+title: Tidy Tuesday 52 - Christmas Songs
+author: James Wade
+date: '2019-12-24'
+slug: tidy-tuesday-52-christmas-songs
+categories:
+  - R
+  - text analysis
+  - Christmas
+  - songs
+tags:
+  - data viz
+  - R Markdown
+  - plot
+  - TidyTuesday
+---
+
+This week's [#TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-24) is fittingly about Christmas songs. The clean version of the data comes from [Kaggle](https://www.kaggle.com/sharkbait1223/billboard-top-100-christmas-carol-dataset/kernels).
+
+## Data Import
+
+As always, we'll start with data import, and I'll use the tidytuesdayR package.
+
+```{r message=FALSE}
+library(tidyverse)
+library(ggthemes)
+dat <- tidytuesdayR::tt_load(2019, week = 52)
+
+lyrics <- dat$christmas_lyrics
+songs <- dat $christmas_songs
+```
+
+## Songs
+
+I'll start by summarising some of the data. I'll add three stats in this step:
+
+1. Total number of songs put out by the performer(s)
+1. Length the artist's song spent on the billboard top 100
+1. Quality score for the song defined as the sum of the normalized "rank" of the song. See the code below for details.
+
+
+```{r fig.width=8, fig.height=8}
+popular_songs <- songs %>% 
+  mutate(rank = (100 - week_position) / 100) %>%
+  mutate(song = str_to_title(song)) %>% 
+  group_by(performer, song, songid) %>% 
+  summarise(song_rank = sum(rank),
+            release_year = min(year)) %>% 
+  ungroup() %>% 
+  arrange(-song_rank) %>% 
+  unite(song:performer, col = "song_artist", sep = "\n", remove = FALSE) %>% 
+  mutate(decade = release_year - release_year %% 10)
+
+top_songs <- popular_songs$song_rank[25]
+
+p1 <- ggplot(popular_songs %>% filter(song_rank >= top_songs)) +
+  geom_col(aes(x = reorder(song_artist, song_rank), y = song_rank, fill = factor(decade))) +
+  theme_clean() +
+  theme(legend.position = c(0.9, 0.2),
+        axis.ticks = element_blank()) +
+  coord_flip() + 
+  scale_fill_brewer(palette = "RdYlGn", direction = 1) +
+  labs(y = "Popularity Score", x = "", 
+       fill = NULL,
+       title = "Most Popular Christmas Songs of All Time", 
+       subtitle = "Source: Billboard Top 100 1958-2017",
+       caption = "#TidyTuesday | @JamesHWade")
+
+# uncomment to save
+ggsave(p1, filename = "top_songs.png", dpi = "retina", width = 8, height = 10)
+
+p1
+
+```
+
+### One-Christmas-Hit-Wonder
+
+Now, let's take a look at which performers has the most Christmas hits, not just a one-Christmas-hit-wonder. The first plot shows number of songs on the Billboard Top 100 for each performer. Not too surprisingly, most performers only have one hit.
+
+```{r fig.width=8, fig.height=8}
+popular_artists <- songs %>% 
+  mutate(rank = (100 - week_position) / 100) %>% 
+  group_by(performer, song) %>% 
+  mutate(song_quality = sum(rank)) %>% 
+  ungroup() %>% 
+  select(song, performer, song_quality) %>% 
+  distinct() %>% 
+  group_by(performer) %>% 
+  summarise(hits = n(),
+            avg_quality = mean(song_quality)) %>% 
+  arrange(-hits)
+
+
+most_songs <- popular_artists %>% select(performer, hits) %>% unique() %>% arrange(-hits) %>% pull(hits) %>% .[15]
+
+p2 <- ggplot(popular_artists %>% filter(hits >= most_songs)) + 
+  geom_col(aes(x = reorder(performer, hits), y = hits, fill = avg_quality)) +
+  coord_flip() +
+  theme_clean() +
+  theme(legend.position = c(0.9, 0.2),
+        axis.ticks = element_blank()) +
+  # scale_fill_brewer(palette = "RdYlGn", direction = 1) +
+  labs(y = "# of Christmas Hits", x = "", 
+       fill = "Average Score Quality",
+       title = "Number of Christmas Hits for Each Artist", 
+       subtitle = "Source: Billboard Top 100 1958-2017",
+       caption = "#TidyTuesday | @JamesHWade") +
+  scale_fill_viridis_c()
+  
+
+ggsave(p2, filename = "performers_mostsongs.png", dpi = "retina", width = 8, height = 8)
+
+p2
+```
+
+To see who makes the most popular Christmas songs on average, here's plot showing number for Christmas hits versus the average popularity score. I've highlihted Mariah Carey and the Glee cast. It seems that the Glee cast barely made the Billboard top 100, as their popularity score is quite low.
+
+
+```{r}
+p3 <- ggplot(popular_artists) + 
+  geom_point(aes(x = hits, y = avg_quality, color = performer)) +
+  theme_clean() +
+  theme(legend.position = "none") +
+  # scale_fill_brewer(palette = "RdYlGn", direction = 1) +
+  labs(x = "# of Christmas Hits", y = "Average Song Popularity Score", 
+       fill = NULL,
+       title = "Average Song Popularity vs Number of Christmas Hits", 
+       subtitle = "Source: Billboard Top 100 1958-2017",
+       caption = "#TidyTuesday | @JamesHWade") +
+  geom_curve(x = 2.5, xend = 2.02, y = 6, yend = 6.78, arrow = arrow(length = unit(.2, 'cm'))) +
+  geom_curve(x = 3.5, xend = 3.98, y = 1, yend = 0.25, arrow = arrow(length = unit(.2, 'cm'))) +
+  annotate("text", label = "Mariah Carey", x = 2.6, y = 5.75) +
+  annotate("text", label = "Glee Cast", x = 3.4, y = 1.5) +
+  scale_color_viridis_d()
+
+ggsave(p3, filename = "popular_vs_number.png", dpi = "retina", width = 5, height = 5)
+
+p3
+```
+
+To see who makes the *best* (mesured in popularity) Christmas songs, here's a bar chart showing the artists with the highest average score performance.
+
+
+```{r, fig.width = 8, fig.height=8}
+p4 <- ggplot(popular_artists %>% filter(avg_quality > 2)) + 
+  geom_col(aes(x = reorder(performer, avg_quality), y = avg_quality, fill = avg_quality)) +
+  coord_flip() +
+  theme_clean() +
+  labs(y = "Average Quality Score",  y = "") +
+  theme(axis.ticks = element_blank()) +
+  theme(legend.position = "none") +
+  labs(x = "", y = "Average Song Popularity Score",
+       title = "Top Christmas Artists by Average Song Popularity",
+       subtitle = "Source: Billboard Top 100 1958-2017",
+       caption = "#TidyTuesday | @JamesHWade") +
+  # scale_fill_brewer(palette = "RdYlGn", direction = 1) +
+  scale_fill_continuous(type = "viridis")
+
+ggsave(p4, filename = "avg_popularity.png", dpi = "retina", width = 8, height = 8)
+
+p4
+
+```
+
+### Christmas Songs by Year
+
+It looks like the popularity of Christmas songs is declining over time. The plot below of Christmas hits release by year shows this declining trend.
+
+```{r message=FALSE, warning=FALSE}
+songs_by_year <- songs %>% group_by(song) %>%
+  mutate(year = min(year)) %>% 
+  ungroup() %>% 
+  group_by(year) %>% 
+  summarise(song_count = n())
+
+ggplot(songs_by_year, aes(x = year, y = song_count)) +
+  geom_line() +
+  theme_clean() +
+  geom_smooth(se = FALSE) +
+  labs(x = "Year", y = "Number of Hit Songs", 
+       title = "Hit Christmas Songs per Year", 
+       subtitle = "Source: Billboard Top 100 1958-2017",
+       caption = "#TidyTuesday | @JamesHWade")
+
+```
+
+## Lyrics
+
+I am a novice when it comes to text analysis, so I will reuse other's code here to get my feet wet.
+

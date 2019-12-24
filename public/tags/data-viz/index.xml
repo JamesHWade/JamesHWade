@@ -6,10 +6,22 @@
     <description>Recent content in data viz on James H. Wade</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 16 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 24 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/data-viz/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Tidy Tuesday 52 - Christmas Songs</title>
+      <link>/2019/12/24/tidy-tuesday-52-christmas-songs/</link>
+      <pubDate>Tue, 24 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/12/24/tidy-tuesday-52-christmas-songs/</guid>
+      <description>This week’s #TidyTuesday is fittingly about Christmas songs. The clean version of the data comes from Kaggle.
+Data Import As always, we’ll start with data import, and I’ll use the tidytuesdayR package.
+library(tidyverse) library(ggthemes) dat &amp;lt;- tidytuesdayR::tt_load(2019, week = 52) lyrics &amp;lt;- dat$christmas_lyrics songs &amp;lt;- dat $christmas_songs  Songs I’ll start by summarising some of the data. I’ll add three stats in this step:
+Total number of songs put out by the performer(s) Length the artist’s song spent on the billboard top 100 Quality score for the song defined as the sum of the normalized “rank” of the song.</description>
+    </item>
     
     <item>
       <title>Tidy Tuesday 2019-51</title>
