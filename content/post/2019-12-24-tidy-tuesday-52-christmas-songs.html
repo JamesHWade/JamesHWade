@@ -89,7 +89,7 @@ p2 &lt;- ggplot(popular_artists %&gt;% filter(hits &gt;= most_songs)) +
   geom_col(aes(x = reorder(performer, hits), y = hits, fill = avg_quality)) +
   coord_flip() +
   theme_clean() +
-  theme(legend.position = c(0.9, 0.2),
+  theme(legend.position = c(0.8, 0.2),
         axis.ticks = element_blank()) +
   # scale_fill_brewer(palette = &quot;RdYlGn&quot;, direction = 1) +
   labs(y = &quot;# of Christmas Hits&quot;, x = &quot;&quot;, 
@@ -100,7 +100,7 @@ p2 &lt;- ggplot(popular_artists %&gt;% filter(hits &gt;= most_songs)) +
   scale_fill_viridis_c()
   
 
-ggsave(p2, filename = &quot;performers_mostsongs.png&quot;, dpi = &quot;retina&quot;, width = 8, height = 8)
+ggsave(p2, filename = &quot;performers_mostsongs.png&quot;, dpi = &quot;retina&quot;, width = 10, height = 10)
 
 p2</code></pre>
 <p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-3-1.png" width="768" /></p>

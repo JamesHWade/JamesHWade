@@ -97,7 +97,7 @@ p2 <- ggplot(popular_artists %>% filter(hits >= most_songs)) +
   geom_col(aes(x = reorder(performer, hits), y = hits, fill = avg_quality)) +
   coord_flip() +
   theme_clean() +
-  theme(legend.position = c(0.9, 0.2),
+  theme(legend.position = c(0.8, 0.2),
         axis.ticks = element_blank()) +
   # scale_fill_brewer(palette = "RdYlGn", direction = 1) +
   labs(y = "# of Christmas Hits", x = "", 
@@ -108,7 +108,7 @@ p2 <- ggplot(popular_artists %>% filter(hits >= most_songs)) +
   scale_fill_viridis_c()
   
 
-ggsave(p2, filename = "performers_mostsongs.png", dpi = "retina", width = 8, height = 8)
+ggsave(p2, filename = "performers_mostsongs.png", dpi = "retina", width = 10, height = 10)
 
 p2
 ```
