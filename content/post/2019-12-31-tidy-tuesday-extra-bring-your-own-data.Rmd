@@ -1,0 +1,152 @@
+---
+title: Tidy Tuesday Extra - Bring Your Own Data
+author: James Wade
+date: '2019-12-31'
+slug: tidy-tuesday-extra-bring-your-own-data
+categories:
+  - R
+  - government
+  - spending
+tags:
+  - data viz
+  - plot
+  - R Markdown
+  - TidyTuesday
+---
+
+For this 53rd Tuesday in 2019, [#TidyTuesday](https://github.com/rfordatascience/tidytuesday) is a byod (bring-your-own-data) special. For this week, I'll take a look at one of the weeks I missed from earlier in 2019. I'm only a few years removed from my grad school days, so government spending on R&D is an interest of mine. Week 7 it is: Federal R&D Spending. This is a very short post, but I have family in town, so I don't wan tot go too far down a rabbit hole.
+
+## Data Import
+
+For import, I'll use the `{tidytuesdayR}` package - quick and easy.
+
+```{r}
+# import data using the {tidytuesdayR} package
+dat <- tidytuesdayR::tt_load(2019, week = 7)
+
+# assign each element in list to variable
+fed_tot <- dat$fed_r_d_spending
+climate <- dat$climate_spending
+energy <- dat$energy_spending
+```
+
+To get a sense of relavtive changes by year, I'll add a few columns with `mutate`. These basic tranformations enable comparisons to total and discresionary spending.
+
+```{r fed_spending, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(cowplot)
+
+# summarise spending by department as percentage of GDP, discretionary, & total spending
+fed_tot <- fed_tot %>%
+  group_by(department) %>% 
+  mutate(rd_percent_tot = rd_budget / total_outlays * 100,
+         rd_percent_disc = rd_budget / discretionary_outlays * 100,
+         rd_vs_gdp = rd_budget / gdp * 100) %>% 
+  arrange(rd_percent_tot) %>% 
+  ungroup()
+
+# summarise by defense and non
+```
+
+
+```{r fed_spending_plots, fig.height=6, fig.width=6, fig.align="center", message=FALSE, warning=FALSE}
+p1_dollars <- ggplot(fed_tot) + 
+  geom_area(aes(x = year, y = rd_budget / 1e9, fill = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "R&D Spending \n(Billions of Dollars)", fill = "Agency",
+       title = "US Federal R&D Spending over Time",
+       subtitle = "Source: AAAS | 1976-2017",
+       caption = "#TidyTuesday | @JamesHWade") +
+  scale_fill_viridis_d()
+
+p1_dollars
+
+p1_percent_tot <- ggplot(fed_tot) + 
+  geom_area(aes(x = year, y = rd_percent_tot, fill = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "R&D Spending \n(Percent of Total Spending)", fill = "Agency",
+       title = "US Federal R&D Spending as Percentage of Total",
+       subtitle = "Source: AAAS | 1976-2017",
+       caption = "#TidyTuesday | @JamesHWade") +
+  scale_fill_viridis_d()
+
+p1_percent_tot
+
+p1_percent_gdp <- ggplot(fed_tot) + 
+  geom_area(aes(x = year, y = rd_vs_gdp, fill = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "R&D Spending \n(Percentage of GDP)", fill = "Agency",
+       title = "US Federal R&D Spending as Percentage of GDP",
+       subtitle = "Source: AAAS | 1976-2017",
+       caption = "#TidyTuesday | @JamesHWade") +
+  scale_fill_viridis_d()
+
+p1_percent_gdp
+
+# uncomment ot save
+ggsave(p1_dollars, filename = "total_dollars.png", width = 6, height = 6, dpi = "retina")
+ggsave(p1_percent_tot, filename = "total_percent.png", width = 6, height = 6, dpi = "retina")
+ggsave(p1_percent_gdp, filename = "total_gdp.png", width = 6, height = 6, dpi = "retina")
+```
+
+## Defense vs Non-Defense
+
+To get a sense of defense versus non-defense spenidng, I've re-color the plots as either defense or non-defense.
+
+```{r def_vs_non_line, fig.height=6, fig.width=6, fig.align="center"}
+p2_dollars <- ggplot(fed_tot) + 
+  geom_area(aes(x = year, 
+                y = rd_budget / 1e9, 
+                fill = department == "DOD", 
+                group = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  scale_fill_manual(values = c("#91bfdb", "#fc8d59"), 
+                      labels = c("Non-Defense", "Defense")) +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "R&D Spending \n(Billions of Dollars)", fill = "Agency",
+       title = "US Federal R&D Spending over Time",
+       subtitle = "Source: AAAS | 1976-2017",
+       caption = "#TidyTuesday | @JamesHWade")
+
+p2_dollars
+
+p2_percent_tot <- ggplot(fed_tot) + 
+  geom_area(aes(x = year,
+                y = rd_percent_tot, 
+                fill = department == "DOD", 
+                group = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  scale_fill_manual(values = c("#91bfdb", "#fc8d59"), 
+                      labels = c("Non-Defense", "Defense")) +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "R&D Spending \n(Percentage of Total Spending)", fill = "Agency",
+       title = "US Federal R&D Spending as Percentage of Total",
+       subtitle = "Source: AAAS | 1976-2017",
+       caption = "#TidyTuesday | @JamesHWade")
+
+p2_percent_tot
+
+p2_percent_gdp <- ggplot(fed_tot) + 
+  geom_area(aes(x = year, 
+                y = rd_vs_gdp, 
+                fill = department == "DOD", 
+                group = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  scale_fill_manual(values = c("#91bfdb", "#fc8d59"), 
+                      labels = c("Non-Defense", "Defense")) +
+  theme(legend.position = "bottom") +
+  labs(x = "", y = "R&D Spending \n(Percentage of GDP)", fill = "Agency",
+       title = "US Federal R&D Spending as Percentage of GDP",
+       subtitle = "Source: AAAS | 1976-2017",
+       caption = "#TidyTuesday | @JamesHWade")
+
+p2_percent_gdp
+
+# uncomment to save
+ggsave(p2_dollars, filename = "total_dollars_2.png", width = 6, height = 6, dpi = "retina")
+ggsave(p2_percent_tot, filename = "total_percent_2.png", width = 6, height = 6, dpi = "retina")
+ggsave(p2_percent_gdp, filename = "total_gdp_2.png", width = 6, height = 6, dpi = "retina")
+```

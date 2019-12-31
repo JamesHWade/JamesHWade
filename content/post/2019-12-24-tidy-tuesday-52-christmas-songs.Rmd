@@ -15,6 +15,11 @@ tags:
   - TidyTuesday
 ---
 
+```{r include=FALSE}
+knitr::opts_chunk$set(fig.align = "center")
+```
+
+
 This week's [#TidyTuesday](https://github.com/rfordatascience/tidytuesday/tree/master/data/2019/2019-12-24) is fittingly about Christmas songs. The clean version of the data comes from [Kaggle](https://www.kaggle.com/sharkbait1223/billboard-top-100-christmas-carol-dataset/kernels).
 
 ## Data Import
@@ -77,7 +82,7 @@ p1
 
 Now, let's take a look at which performers has the most Christmas hits, not just a one-Christmas-hit-wonder. The first plot shows number of songs on the Billboard Top 100 for each performer. Not too surprisingly, most performers only have one hit.
 
-```{r fig.width=8, fig.height=8}
+```{r fig.width=10, fig.height=10}
 popular_artists <- songs %>% 
   mutate(rank = (100 - week_position) / 100) %>% 
   group_by(performer, song) %>% 

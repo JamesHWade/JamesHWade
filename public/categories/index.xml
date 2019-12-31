@@ -6,10 +6,37 @@
     <description>Recent content in Categories on James H. Wade</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 24 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 31 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>government</title>
+      <link>/categories/government/</link>
+      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/government/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>R</title>
+      <link>/categories/r/</link>
+      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>spending</title>
+      <link>/categories/spending/</link>
+      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/spending/</guid>
+      <description></description>
+    </item>
     
     <item>
       <title>Christmas</title>
@@ -17,15 +44,6 @@
       <pubDate>Tue, 24 Dec 2019 00:00:00 +0000</pubDate>
       
       <guid>/categories/christmas/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>R</title>
-      <link>/categories/r/</link>
-      <pubDate>Tue, 24 Dec 2019 00:00:00 +0000</pubDate>
-      
-      <guid>/categories/r/</guid>
       <description></description>
     </item>
     

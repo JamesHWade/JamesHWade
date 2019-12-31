@@ -1,0 +1,140 @@
+---
+title: Tidy Tuesday Extra - Bring Your Own Data
+author: James Wade
+date: '2019-12-31'
+slug: tidy-tuesday-extra-bring-your-own-data
+categories:
+  - R
+  - government
+  - spending
+tags:
+  - data viz
+  - plot
+  - R Markdown
+  - TidyTuesday
+---
+
+
+
+<p>For this 53rd Tuesday in 2019, <a href="https://github.com/rfordatascience/tidytuesday">#TidyTuesday</a> is a byod (bring-your-own-data) special. For this week, I’ll take a look at one of the weeks I missed from earlier in 2019. I’m only a few years removed from my grad school days, so government spending on R&amp;D is an interest of mine. Week 7 it is: Federal R&amp;D Spending. This is a very short post, but I have family in town, so I don’t wan tot go too far down a rabbit hole.</p>
+<div id="data-import" class="section level2">
+<h2>Data Import</h2>
+<p>For import, I’ll use the <code>{tidytuesdayR}</code> package - quick and easy.</p>
+<pre class="r"><code># import data using the {tidytuesdayR} package
+dat &lt;- tidytuesdayR::tt_load(2019, week = 7)
+
+# assign each element in list to variable
+fed_tot &lt;- dat$fed_r_d_spending
+climate &lt;- dat$climate_spending
+energy &lt;- dat$energy_spending</code></pre>
+<p>To get a sense of relavtive changes by year, I’ll add a few columns with <code>mutate</code>. These basic tranformations enable comparisons to total and discresionary spending.</p>
+<pre class="r"><code>library(tidyverse)
+library(cowplot)
+
+# summarise spending by department as percentage of GDP, discretionary, &amp; total spending
+fed_tot &lt;- fed_tot %&gt;%
+  group_by(department) %&gt;% 
+  mutate(rd_percent_tot = rd_budget / total_outlays * 100,
+         rd_percent_disc = rd_budget / discretionary_outlays * 100,
+         rd_vs_gdp = rd_budget / gdp * 100) %&gt;% 
+  arrange(rd_percent_tot) %&gt;% 
+  ungroup()
+
+# summarise by defense and non</code></pre>
+<pre class="r"><code>p1_dollars &lt;- ggplot(fed_tot) + 
+  geom_area(aes(x = year, y = rd_budget / 1e9, fill = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;R&amp;D Spending \n(Billions of Dollars)&quot;, fill = &quot;Agency&quot;,
+       title = &quot;US Federal R&amp;D Spending over Time&quot;,
+       subtitle = &quot;Source: AAAS | 1976-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;) +
+  scale_fill_viridis_d()
+
+p1_dollars</code></pre>
+<p><img src="/post/2019-12-31-tidy-tuesday-extra-bring-your-own-data_files/figure-html/fed_spending_plots-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>p1_percent_tot &lt;- ggplot(fed_tot) + 
+  geom_area(aes(x = year, y = rd_percent_tot, fill = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;R&amp;D Spending \n(Percent of Total Spending)&quot;, fill = &quot;Agency&quot;,
+       title = &quot;US Federal R&amp;D Spending as Percentage of Total&quot;,
+       subtitle = &quot;Source: AAAS | 1976-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;) +
+  scale_fill_viridis_d()
+
+p1_percent_tot</code></pre>
+<p><img src="/post/2019-12-31-tidy-tuesday-extra-bring-your-own-data_files/figure-html/fed_spending_plots-2.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>p1_percent_gdp &lt;- ggplot(fed_tot) + 
+  geom_area(aes(x = year, y = rd_vs_gdp, fill = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;R&amp;D Spending \n(Percentage of GDP)&quot;, fill = &quot;Agency&quot;,
+       title = &quot;US Federal R&amp;D Spending as Percentage of GDP&quot;,
+       subtitle = &quot;Source: AAAS | 1976-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;) +
+  scale_fill_viridis_d()
+
+p1_percent_gdp</code></pre>
+<p><img src="/post/2019-12-31-tidy-tuesday-extra-bring-your-own-data_files/figure-html/fed_spending_plots-3.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># uncomment ot save
+ggsave(p1_dollars, filename = &quot;total_dollars.png&quot;, width = 6, height = 6, dpi = &quot;retina&quot;)
+ggsave(p1_percent_tot, filename = &quot;total_percent.png&quot;, width = 6, height = 6, dpi = &quot;retina&quot;)
+ggsave(p1_percent_gdp, filename = &quot;total_gdp.png&quot;, width = 6, height = 6, dpi = &quot;retina&quot;)</code></pre>
+</div>
+<div id="defense-vs-non-defense" class="section level2">
+<h2>Defense vs Non-Defense</h2>
+<p>To get a sense of defense versus non-defense spenidng, I’ve re-color the plots as either defense or non-defense.</p>
+<pre class="r"><code>p2_dollars &lt;- ggplot(fed_tot) + 
+  geom_area(aes(x = year, 
+                y = rd_budget / 1e9, 
+                fill = department == &quot;DOD&quot;, 
+                group = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  scale_fill_manual(values = c(&quot;#91bfdb&quot;, &quot;#fc8d59&quot;), 
+                      labels = c(&quot;Non-Defense&quot;, &quot;Defense&quot;)) +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;R&amp;D Spending \n(Billions of Dollars)&quot;, fill = &quot;Agency&quot;,
+       title = &quot;US Federal R&amp;D Spending over Time&quot;,
+       subtitle = &quot;Source: AAAS | 1976-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;)
+
+p2_dollars</code></pre>
+<p><img src="/post/2019-12-31-tidy-tuesday-extra-bring-your-own-data_files/figure-html/def_vs_non_line-1.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>p2_percent_tot &lt;- ggplot(fed_tot) + 
+  geom_area(aes(x = year,
+                y = rd_percent_tot, 
+                fill = department == &quot;DOD&quot;, 
+                group = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  scale_fill_manual(values = c(&quot;#91bfdb&quot;, &quot;#fc8d59&quot;), 
+                      labels = c(&quot;Non-Defense&quot;, &quot;Defense&quot;)) +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;R&amp;D Spending \n(Percentage of Total Spending)&quot;, fill = &quot;Agency&quot;,
+       title = &quot;US Federal R&amp;D Spending as Percentage of Total&quot;,
+       subtitle = &quot;Source: AAAS | 1976-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;)
+
+p2_percent_tot</code></pre>
+<p><img src="/post/2019-12-31-tidy-tuesday-extra-bring-your-own-data_files/figure-html/def_vs_non_line-2.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>p2_percent_gdp &lt;- ggplot(fed_tot) + 
+  geom_area(aes(x = year, 
+                y = rd_vs_gdp, 
+                fill = department == &quot;DOD&quot;, 
+                group = reorder(department, -rd_percent_tot))) + 
+  theme_cowplot() +
+  scale_fill_manual(values = c(&quot;#91bfdb&quot;, &quot;#fc8d59&quot;), 
+                      labels = c(&quot;Non-Defense&quot;, &quot;Defense&quot;)) +
+  theme(legend.position = &quot;bottom&quot;) +
+  labs(x = &quot;&quot;, y = &quot;R&amp;D Spending \n(Percentage of GDP)&quot;, fill = &quot;Agency&quot;,
+       title = &quot;US Federal R&amp;D Spending as Percentage of GDP&quot;,
+       subtitle = &quot;Source: AAAS | 1976-2017&quot;,
+       caption = &quot;#TidyTuesday | @JamesHWade&quot;)
+
+p2_percent_gdp</code></pre>
+<p><img src="/post/2019-12-31-tidy-tuesday-extra-bring-your-own-data_files/figure-html/def_vs_non_line-3.png" width="576" style="display: block; margin: auto;" /></p>
+<pre class="r"><code># uncomment to save
+ggsave(p2_dollars, filename = &quot;total_dollars_2.png&quot;, width = 6, height = 6, dpi = &quot;retina&quot;)
+ggsave(p2_percent_tot, filename = &quot;total_percent_2.png&quot;, width = 6, height = 6, dpi = &quot;retina&quot;)
+ggsave(p2_percent_gdp, filename = &quot;total_gdp_2.png&quot;, width = 6, height = 6, dpi = &quot;retina&quot;)</code></pre>
+</div>

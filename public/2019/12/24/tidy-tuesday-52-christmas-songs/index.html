@@ -124,7 +124,7 @@ p1 &lt;- ggplot(popular_songs %&gt;% filter(song_rank &gt;= top_songs)) +
 ggsave(p1, filename = &quot;top_songs.png&quot;, dpi = &quot;retina&quot;, width = 8, height = 10)
 
 p1</code></pre>
-<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-3-1.png" width="768" style="display: block; margin: auto;" /></p>
 <div id="one-christmas-hit-wonder" class="section level3">
 <h3>One-Christmas-Hit-Wonder</h3>
 <p>Now, let’s take a look at which performers has the most Christmas hits, not just a one-Christmas-hit-wonder. The first plot shows number of songs on the Billboard Top 100 for each performer. Not too surprisingly, most performers only have one hit.</p>
@@ -161,7 +161,7 @@ p2 &lt;- ggplot(popular_artists %&gt;% filter(hits &gt;= most_songs)) +
 ggsave(p2, filename = &quot;performers_mostsongs.png&quot;, dpi = &quot;retina&quot;, width = 10, height = 10)
 
 p2</code></pre>
-<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-3-1.png" width="768" /></p>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-4-1.png" width="960" style="display: block; margin: auto;" /></p>
 <p>To see who makes the most popular Christmas songs on average, here’s plot showing number for Christmas hits versus the average popularity score. I’ve highlihted Mariah Carey and the Glee cast. It seems that the Glee cast barely made the Billboard top 100, as their popularity score is quite low.</p>
 <pre class="r"><code>p3 &lt;- ggplot(popular_artists) + 
   geom_point(aes(x = hits, y = avg_quality, color = performer)) +
@@ -182,7 +182,7 @@ p2</code></pre>
 ggsave(p3, filename = &quot;popular_vs_number.png&quot;, dpi = &quot;retina&quot;, width = 5, height = 5)
 
 p3</code></pre>
-<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>To see who makes the <em>best</em> (mesured in popularity) Christmas songs, here’s a bar chart showing the artists with the highest average score performance.</p>
 <pre class="r"><code>p4 &lt;- ggplot(popular_artists %&gt;% filter(avg_quality &gt; 2)) + 
   geom_col(aes(x = reorder(performer, avg_quality), y = avg_quality, fill = avg_quality)) +
@@ -201,7 +201,7 @@ p3</code></pre>
 ggsave(p4, filename = &quot;avg_popularity.png&quot;, dpi = &quot;retina&quot;, width = 8, height = 8)
 
 p4</code></pre>
-<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-5-1.png" width="768" /></p>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-6-1.png" width="768" style="display: block; margin: auto;" /></p>
 </div>
 <div id="christmas-songs-by-year" class="section level3">
 <h3>Christmas Songs by Year</h3>
@@ -220,7 +220,7 @@ ggplot(songs_by_year, aes(x = year, y = song_count)) +
        title = &quot;Hit Christmas Songs per Year&quot;, 
        subtitle = &quot;Source: Billboard Top 100 1958-2017&quot;,
        caption = &quot;#TidyTuesday | @JamesHWade&quot;)</code></pre>
-<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<p><img src="/post/2019-12-24-tidy-tuesday-52-christmas-songs_files/figure-html/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="lyrics" class="section level2">

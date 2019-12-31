@@ -6,10 +6,19 @@
     <description>Recent content on James H. Wade</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 24 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 31 Dec 2019 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Tidy Tuesday Extra - Bring Your Own Data</title>
+      <link>/2019/12/31/tidy-tuesday-extra-bring-your-own-data/</link>
+      <pubDate>Tue, 31 Dec 2019 00:00:00 +0000</pubDate>
+      
+      <guid>/2019/12/31/tidy-tuesday-extra-bring-your-own-data/</guid>
+      <description>For this 53rd Tuesday in 2019, #TidyTuesday is a byod (bring-your-own-data) special. For this week, I’ll take a look at one of the weeks I missed from earlier in 2019. I’m only a few years removed from my grad school days, so government spending on R&amp;amp;D is an interest of mine. Week 7 it is: Federal R&amp;amp;D Spending. This is a very short post, but I have family in town, so I don’t wan tot go too far down a rabbit hole.</description>
+    </item>
     
     <item>
       <title>Tidy Tuesday 52 - Christmas Songs</title>
