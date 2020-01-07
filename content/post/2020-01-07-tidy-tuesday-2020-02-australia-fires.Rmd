@@ -70,13 +70,17 @@ years <- sample(unique(temperature_2$year), 2)
 
 a <- temperature_2 %>% filter(year %in% years)
 
+avg <- a %>% select(city_name, temp_type, site_name, month, day, avg_temp) %>% distinct()
+
 ggplot(a) + 
-    geom_density(aes(x = temperature, fill = factor(year)), alpha = 0.5) +
-    facet_wrap(~city_name)
+  geom_density(data = avg, aes(x = avg_temp), fill = "grey") +  
+  geom_density(aes(x = temperature, fill = factor(year)), alpha = 0.5) +
+    facet_wrap(~city_name) +
+  cowplot::theme_cowplot()
 
-aus <- ne_states(country = "Australia", returnclass = 'sf')
+# aus <- ne_states(country = "Australia", returnclass = 'sf')
 
-ggplot(aus) + geom_sf() + 
-  geom_point(data = sample_n(rainfall_2, 1e4), aes(y = lat, x = long, color = ), alpha = 0.4)
+# ggplot(aus) + geom_sf() + 
+#   geom_point(data = sample_n(rainfall_2, 1e4), aes(y = lat, x = long, color = ), alpha = 0.4)
 ```
 
