@@ -1,32 +1,3 @@
----
-title: Tidy Tuesday 2020-02 - Australia Fires
-author: James Wade
-date: '2020-01-07'
-slug: tidy-tuesday-2020-02-australia-fires
-categories:
-  - R
-  - climate change
-  - natural disaster
-tags:
-  - data viz
-  - plot
-  - R Markdown
-  - TidyTuesday
----
-
-
-
-The 2nd (1st?) [#TidyTuesday](https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-01-07/readme.md) of the year is on the Australia Bush Fires that are currently (as of 2020-01-07) raging. To display the temperature data, I built a shiny app.
-
-As an aside, I followed [this post](https://liuyanguu.github.io/post/2019/02/24/shiny-in-blogdown/) from Yang Liu to embed the app below.
-
-If the app fails, you can [use it directly](http://james-h-wade.shinyapps.io/TidyTuesday_2019-02) on shinyapps.io.
-
-<iframe src="https://james-h-wade.shinyapps.io/TidyTuesday_2019-02/" width=1000 height=800"></iframe>
-
-## Code for Shiny App
-
-```{r message=FALSE, warning=FALSE, eval=FALSE}
 library(tidyverse)
 library(shiny)
 library(shinydashboard)
@@ -121,4 +92,3 @@ server <- function(input, output) {
 
 # Run the application 
 shinyApp(ui = ui, server = server)
-```

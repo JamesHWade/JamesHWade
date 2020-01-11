@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Hugo 0.61.0" />
+
+
+<title>Tidy Tuesday 2020-02 - Australia Fires - James H. Wade</title>
+<meta property="og:title" content="Tidy Tuesday 2020-02 - Australia Fires - James H. Wade">
+
+
+  <link href='/favicon.ico' rel='icon' type='image/x-icon'/>
+
+
+
+  
+
+
+
+
+
+
+
+
+<link href='//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css' rel='stylesheet' type='text/css' />
+
+
+
+<link rel="stylesheet" href="/css/fonts.css" media="all">
+<link rel="stylesheet" href="/css/main.css" media="all">
+
+
+
+  </head>
+  <body>
+    <div class="wrapper">
+      <header class="header">
+        <nav class="nav">
+  <a href="/" class="nav-logo">
+    <img src="/images/logo.png"
+         width="50"
+         height="50"
+         alt="Logo">
+  </a>
+
+  <ul class="nav-links">
+    
+    <li><a href="/about/">About</a></li>
+    
+    <li><a href="https://github.com/JamesHWade">GitHub</a></li>
+    
+    <li><a href="https://twitter.com/JamesHWade">Twitter</a></li>
+    
+  </ul>
+</nav>
+
+      </header>
+
+
+<main class="content" role="main">
+
+  <article class="article">
+    
+    <span class="article-duration">2 min read</span>
+    
+
+    <h1 class="article-title">Tidy Tuesday 2020-02 - Australia Fires</h1>
+
+    
+    <span class="article-date">2020-01-07</span>
+    
+
+    <div class="article-content">
+      
+
+
+<p>The 2nd (1st?) <a href="https://github.com/rfordatascience/tidytuesday/blob/master/data/2020/2020-01-07/readme.md">#TidyTuesday</a> of the year is on the Australia Bush Fires that are currently (as of 2020-01-07) raging. To display the temperature data, I built a shiny app.</p>
+<p>As an aside, I followed <a href="https://liuyanguu.github.io/post/2019/02/24/shiny-in-blogdown/">this post</a> from Yang Liu to embed the app below.</p>
+<p>If the app fails, you can <a href="http://james-h-wade.shinyapps.io/TidyTuesday_2019-02">use it directly</a> on shinyapps.io.</p>
+<iframe src="https://james-h-wade.shinyapps.io/TidyTuesday_2019-02/" width="1000" height="800&quot;">
+</iframe>
+<div id="code-for-shiny-app" class="section level2">
+<h2>Code for Shiny App</h2>
+<pre class="r"><code>library(tidyverse)
+library(shiny)
+library(shinydashboard)
+
+rainfall &lt;- read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-07/rainfall.csv&#39;)
+temperature &lt;- read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-07/temperature.csv&#39;)
+
+temperature_2 &lt;- temperature %&gt;% 
+    filter(complete.cases(.) &amp; temp_type == &quot;max&quot;) %&gt;% 
+    mutate(year = as.integer(lubridate::year(date))) %&gt;%
+    group_by(city_name) %&gt;% 
+    mutate(mean_by_city = mean(temperature),
+           sd_by_city = sd(temperature)) %&gt;% 
+    ungroup() %&gt;% 
+    group_by(city_name, year) %&gt;% 
+    mutate(mean_temp = mean(temperature),
+           temp_score = (mean_temp - mean_by_city) / sd_by_city) %&gt;% 
+    ungroup() 
+
+# Define UI for application that draws a histogram
+ui &lt;- fluidPage(
+    
+    # Application title
+    titlePanel(&quot;Weather in Australia&quot;),
+    
+    fluidRow(
+        column(width = 4,
+               sliderInput(inputId = &quot;year1&quot;, label = &quot;Year 1&quot;, 
+                           min = min(temperature_2$year), 
+                           max = max(temperature_2$year),
+                           step = 1, 
+                           value = 1955,
+                           sep = &quot;&quot;,
+                           animate = TRUE)
+        ),
+        column(width = 4,
+               sliderInput(inputId = &quot;year2&quot;, label = &quot;Year 2&quot;, 
+                           min = min(temperature_2$year), 
+                           max = max(temperature_2$year),
+                           step = 1, 
+                           value = 2017,
+                           sep = &quot;&quot;,
+                           animate = TRUE),
+        ),
+        column(width = 4,
+               selectInput(inputId = &quot;cities&quot;, label = &quot;City&quot;, 
+                           choices =  unique(temperature_2$city_name),
+                           selected = c(&quot;SYDNEY&quot;, &quot;PORT&quot;, &quot;KENT&quot;, &quot;CANBERRA&quot;), 
+                           multiple = TRUE,
+                           selectize = TRUE)
+        ),
+        column(
+            width = 12,
+            plotOutput(&quot;p1&quot;)
+            
+        )
+    )
+)
+
+# Define server logic required to draw a histogram
+server &lt;- function(input, output) {
+    
+    b &lt;- reactive({
+        temperature_2 %&gt;% 
+            filter(city_name %in% input$cities &amp;
+                       (year == input$year1 | year == input$year2))
+    })
+    
+    output$p1 &lt;- renderPlot({
+        ggplot(b()) + 
+            # geom_density(data = avg, aes(x = avg_temp), fill = &quot;grey&quot;) +  
+            geom_density(aes(x = temperature, fill = temp_score, 
+                             group = interaction(city_name, year)), alpha = 0.5) +
+            scale_fill_viridis_c(option = &quot;C&quot;) +
+            geom_vline(aes(xintercept = mean_temp, color = factor(year)), size = 1, linetype = &quot;dashed&quot;) +
+            scale_color_viridis_d() +
+            cowplot::theme_cowplot() +
+            theme(axis.line.y = element_blank(),
+                  axis.text.y = element_blank(),
+                  axis.ticks.y = element_blank(),
+                  axis.title.y = element_blank()) +
+            facet_wrap(~city_name) +
+            # transition_time(year) + ease_aes(&quot;linear&quot;) +
+            labs(x = &quot;Temperature&quot;, 
+                 fill = &quot;Temp Score&quot;,
+                 color = &quot;Mean Temp&quot;,
+                 title = &quot;Temperature Distribution by Year&quot;, 
+                 subtitle = paste(&quot;Years:&quot;, input$year1, &quot;and&quot;, input$year2),
+                 caption = &quot;#TidyTuesday | @JamesHWade&quot;)
+    })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)</code></pre>
+</div>
+
+    </div>
+  </article>
+
+  
+
+
+</main>
+
+      <footer class="footer">
+        <ul class="footer-links">
+          <li>
+            <a href="/index.xml" type="application/rss+xml" target="_blank">RSS feed</a>
+          </li>
+          <li>
+            <a href="https://gohugo.io/" class="footer-links-kudos">Made with <img src="/images/hugo-logo.png" alt="Img link to Hugo website" width="22" height="22"></a>
+          </li>
+        </ul>
+      </footer>
+
+    </div>
+    
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+
+
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/r.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/languages/yaml.min.js"></script>
+<script>hljs.configure({languages: []}); hljs.initHighlightingOnLoad();</script>
+
+
+
+    
+<script src="/js/math-code.js"></script>
+<script async src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+
+    
+  </body>
+</html>
+

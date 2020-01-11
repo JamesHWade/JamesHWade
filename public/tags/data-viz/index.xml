@@ -6,10 +6,22 @@
     <description>Recent content in data viz on James H. Wade</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 31 Dec 2019 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Tue, 07 Jan 2020 00:00:00 +0000</lastBuildDate>
     
 	<atom:link href="/tags/data-viz/index.xml" rel="self" type="application/rss+xml" />
     
+    
+    <item>
+      <title>Tidy Tuesday 2020-02 - Australia Fires</title>
+      <link>/2020/01/07/tidy-tuesday-2020-02-australia-fires/</link>
+      <pubDate>Tue, 07 Jan 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/01/07/tidy-tuesday-2020-02-australia-fires/</guid>
+      <description>The 2nd (1st?) #TidyTuesday of the year is on the Australia Bush Fires that are currently (as of 2020-01-07) raging. To display the temperature data, I built a shiny app.
+As an aside, I followed this post from Yang Liu to embed the app below.
+If the app fails, you can use it directly on shinyapps.io.
+ Code for Shiny App library(tidyverse) library(shiny) library(shinydashboard) rainfall &amp;lt;- read_csv(&amp;#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-07/rainfall.csv&amp;#39;) temperature &amp;lt;- read_csv(&amp;#39;https://raw.</description>
+    </item>
     
     <item>
       <title>Tidy Tuesday Extra - Bring Your Own Data</title>
