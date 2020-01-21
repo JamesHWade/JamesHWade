@@ -1,5 +1,5 @@
 ---
-title: Tidy Tuesday Extra - Bring Your Own Data
+title: Tidy Tuesday 2020-01 - Bring Your Own Data
 author: James Wade
 date: '2019-12-31'
 slug: tidy-tuesday-extra-bring-your-own-data
