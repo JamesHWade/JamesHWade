@@ -6,12 +6,11 @@ library(umap)
 # import data
 tuesdata <- tidytuesdayR::tt_load('2020-01-21') 
 
+# convert data column to date type
 dat <- tuesdata$spotify_songs %>% 
   mutate(track_album_release_date = as.Date(track_album_release_date))
 
-glimpse(dat)
-
-
+# plot track length over time
 p_length <- ggplot(dat, aes(x = track_album_release_date, 
                             y = duration_ms / 60000)) +
   geom_point(aes(color = playlist_genre), alpha = 0.3) + 
@@ -25,7 +24,13 @@ p_length <- ggplot(dat, aes(x = track_album_release_date,
        subtitle = "Souce: Spotify with help from {spotifyr}",
        caption = "#TidyTuesday | Plot by @JamesHWade")
 
+ggsave(plot = p_length,
+       filename = "song_length_by_genre.png", 
+       path = "drafts",
+       dpi = "retina")
 
+
+# dimension reduction of song characteristics with umap
 umap_dat <- umap::umap(scale(dat[, 12:23]))
 
 umap_dims <- data.frame(umap_dat$layout)
@@ -62,7 +67,7 @@ umap_plot <- function(feature_name, data) {
 walk(feature_names, umap_plot, data = dat_2)
 
 # create and save separate umap plot colored by genre
-ggplot(dat_2) + 
+p_umap_genre <- ggplot(dat_2) + 
   geom_point(aes(x = X1, y = X2, color = playlist_genre), alpha = 0.2) +
   theme_cowplot() +
   theme(legend.position = "none") +
@@ -75,6 +80,7 @@ ggplot(dat_2) +
   ) +
   facet_wrap(~playlist_genre)
 
-ggsave(filename = paste0("umap_by_genre.png"), 
+ggsave(plot = p_umap_genre,
+       filename = paste0("umap_by_genre.png"), 
        path = "drafts",
        dpi = "retina")
