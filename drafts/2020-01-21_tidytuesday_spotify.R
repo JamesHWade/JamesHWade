@@ -84,3 +84,22 @@ ggsave(plot = p_umap_genre,
        filename = paste0("umap_by_genre.png"), 
        path = "drafts",
        dpi = "retina")
+
+# animate umap plot
+anim <- ggplot(dat_2) + 
+  geom_point(aes(x = X1, y = X2, color = playlist_genre), alpha = 0.2) +
+  theme(legend.position = "none") +
+  ggdark::dark_theme_minimal(base_size = 16) +
+  labs(x = "UMAP Dimension 1", 
+       y = "UMAP Dimension 2",
+       color = "Genre",
+       title = "Dimension Reduction on Spotify Data with UMAP",
+       subtitle = "Souce: Spotify with help from the spotifyr package",
+       caption = "#TidyTuesday | Plot by @JamesHWade"
+  ) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) +
+  transition_states(playlist_genre) +
+  enter_fade() +
+  exit_fade()
+
+anim_save(anim, filename = "umap_animation.gif", width = 600, height = 500)
