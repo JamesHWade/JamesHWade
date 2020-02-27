@@ -13,3 +13,16 @@ tags:
   - R Markdown
   - TidyTuesday
 ---
+
+## Import Data
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+measles <- read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-02-25/measles.csv')
+glimpse(measles)
+
+numeric_measles <- measles %>% select_if(is.numeric) %>% sample_n(1e4)
+
+pairs(numeric_measles)
+```
+
