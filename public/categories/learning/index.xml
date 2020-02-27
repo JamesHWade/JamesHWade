@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>learning on James H. Wade</title>
+    <link>/categories/learning/</link>
+    <description>Recent content in learning on James H. Wade</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Wed, 26 Feb 2020 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/categories/learning/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>A Collection of Resources for Learning R</title>
+      <link>/2020/02/26/a-collection-of-resources-for-learning-r/</link>
+      <pubDate>Wed, 26 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/2020/02/26/a-collection-of-resources-for-learning-r/</guid>
+      <description>Introduction to the Tidyverse Books  R for Data Science R Cookbook  Workshops from RStudio  R for Excel Users Introduction to Data Science in the Tidyverse Data Visualization with ggplot2 Primers from RStudio  Seminars/Lectures  Intro to the Tidyverse by Thomas Mock Tidyverse Primer from RStudio  Courses  Intro to Tidyverse - LinkedIn Learning R Statistics - LinkedIn Learning Data Science Specialization from Johns Hopkins - Coursera Data Science Series from Harvard - edX  Intermediate/Advanced R Users Books  R Graphics Cookbook R Markdown Advanced R R Packages Hands on Machine Learning with R  Workshops from RStudio  What They Forgot to Teach You about R Tidy Time Series Analysis and Forecasting Big Data with dplyr Applied Machine Learning  Seminars/Lectures  Talks from rstudio::conf2020  Recommended Data Science Talks  Letters to a Young Maintainer by Hadley Wickham Topological Techniques for Unsupervised Learning by Leland Mcinnes at PyData LA 2019 Visualizing uncertainty with hypothetical outcomes plots by Claus Wilke at rstudio::conf 2019 Teaching R to New Users: From tapply to Tidyverse by Roger Peng at UseR 2018  </description>
+    </item>
+    
+  </channel>
+</rss>

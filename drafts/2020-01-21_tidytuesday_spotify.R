@@ -2,6 +2,7 @@
 library(tidyverse)
 library(cowplot)
 library(umap)
+library(gganimate)
 
 # import data
 tuesdata <- tidytuesdayR::tt_load('2020-01-21') 
@@ -103,3 +104,37 @@ anim <- ggplot(dat_2) +
   exit_fade()
 
 anim_save(anim, filename = "umap_animation.gif", width = 600, height = 500)
+
+
+dat_nomode <- dat %>% select(-mode)
+
+umap_dat <- umap::umap(scale(dat_nomode[, 12:22]))
+
+umap_dims <- data.frame(umap_dat$layout)
+
+dat_3 <- bind_cols(dat_nomode, umap_dims)
+
+p_dark_nomode <- ggplot(dat_3) + 
+  geom_point(aes(x = X1, y = X2, color = playlist_genre), alpha = 0.2) +
+  theme(legend.position = "none") +
+  ggdark::dark_theme_minimal(base_size = 16) +
+  labs(x = "UMAP Dimension 1", 
+       y = "UMAP Dimension 2",
+       color = "Genre",
+       title = "Dimension Reduction on Spotify Data with UMAP",
+       subtitle = "Souce: Spotify with help from the spotifyr package",
+       caption = "#TidyTuesday | Plot by @JamesHWade"
+  ) +
+  xlim(-10,10) +
+  guides(colour = guide_legend(override.aes = list(alpha = 1))) +
+  facet_wrap(~playlist_genre)
+
+ggsave(plot = p_dark_nomode,
+       filename = paste0("umap_by_genre_nomode.png"), 
+       path = "drafts",
+       dpi = "retina")
+  
+
+transition_states(playlist_genre) +
+  enter_fade() +
+  exit_fade()

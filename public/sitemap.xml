@@ -3,8 +3,53 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>/2020/02/26/a-collection-of-resources-for-learning-r/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/curation/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/learning/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/learning/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/list/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/post/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/r/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
   </url>
   
   <url>
@@ -14,11 +59,6 @@
   
   <url>
     <loc>/tags/data-viz/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/</loc>
     <lastmod>2020-01-07T00:00:00+00:00</lastmod>
   </url>
   
@@ -33,22 +73,7 @@
   </url>
   
   <url>
-    <loc>/post/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/categories/r/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/tags/r-markdown/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/</loc>
     <lastmod>2020-01-07T00:00:00+00:00</lastmod>
   </url>
   
@@ -114,6 +139,11 @@
   
   <url>
     <loc>/about/</loc>
+    <priority>0</priority>
+  </url>
+  
+  <url>
+    <loc>/1/01/01/</loc>
     <priority>0</priority>
   </url>
   
