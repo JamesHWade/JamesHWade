@@ -39,11 +39,29 @@
     </item>
     
     <item>
+      <title>medicine</title>
+      <link>/categories/medicine/</link>
+      <pubDate>Wed, 26 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/medicine/</guid>
+      <description></description>
+    </item>
+    
+    <item>
       <title>R</title>
       <link>/categories/r/</link>
       <pubDate>Wed, 26 Feb 2020 00:00:00 +0000</pubDate>
       
       <guid>/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>vaccination</title>
+      <link>/categories/vaccination/</link>
+      <pubDate>Wed, 26 Feb 2020 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/vaccination/</guid>
       <description></description>
     </item>
     

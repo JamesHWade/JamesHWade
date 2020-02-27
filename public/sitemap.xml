@@ -18,12 +18,12 @@
   </url>
   
   <url>
-    <loc>/</loc>
+    <loc>/tags/data-viz/</loc>
     <lastmod>2020-02-26T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/categories/learning/</loc>
+    <loc>/</loc>
     <lastmod>2020-02-26T00:00:00+00:00</lastmod>
   </url>
   
@@ -33,7 +33,22 @@
   </url>
   
   <url>
+    <loc>/categories/learning/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/categories/list/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/medicine/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/plot/</loc>
     <lastmod>2020-02-26T00:00:00+00:00</lastmod>
   </url>
   
@@ -48,7 +63,27 @@
   </url>
   
   <url>
+    <loc>/tags/r-markdown/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
     <loc>/tags/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/tags/tidytuesday/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/2020/02/26/tidytuesday-2020-09-measles-vaccination/</loc>
+    <lastmod>2020-02-26T00:00:00+00:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>/categories/vaccination/</loc>
     <lastmod>2020-02-26T00:00:00+00:00</lastmod>
   </url>
   
@@ -58,32 +93,12 @@
   </url>
   
   <url>
-    <loc>/tags/data-viz/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/categories/natural-disaster/</loc>
     <lastmod>2020-01-07T00:00:00+00:00</lastmod>
   </url>
   
   <url>
-    <loc>/tags/plot/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/r-markdown/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
     <loc>/2020/01/07/tidy-tuesday-2020-02-australia-fires/</loc>
-    <lastmod>2020-01-07T00:00:00+00:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>/tags/tidytuesday/</loc>
     <lastmod>2020-01-07T00:00:00+00:00</lastmod>
   </url>
   
